@@ -2,7 +2,7 @@ import { createClient } from "npm:@supabase/supabase-js@2.45.0";
 import { buildSetupScript, formatPull, parseUptime } from "../_shared/routerscript.ts";
 
 // Public endpoints called by the MikroTik itself (no browser JWT): auth is the one-time token or the router's agent key.
-//   GET /router-agent/setup?t=<token>      -> RouterOS script (consumes the token, issues the agent key)
+//   GET /router-agent/setup/<token>        -> RouterOS script (also accepts ?t=<token>) (consumes the token, issues the agent key)
 //   GET /router-agent/sync?id=..&c=..      -> header X-Agent-Key; ack + health in, changes out (text)
 
 const text = (body: string, status = 200) =>
@@ -16,14 +16,17 @@ const intOrNull = (v: string | null) => (v !== null && /^\d{1,12}$/.test(v) ? Nu
 Deno.serve(async (req) => {
   if (req.method !== "GET") return text("method not allowed", 405);
   const url = new URL(req.url);
-  const route = url.pathname.replace(/\/+$/, "").split("/").pop();
+  const parts = url.pathname.replace(/\/+$/, "").split("/");
+  // The token goes in the path (/setup/<token>) because typing "?" in a RouterOS terminal opens its help instead.
+  const pathToken = parts.length >= 2 && parts[parts.length - 2] === "setup" ? parts[parts.length - 1] : null;
+  const route = pathToken !== null ? "setup" : parts.pop();
   const supabase = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!, {
     auth: { persistSession: false },
   });
   const baseUrl = `${Deno.env.get("SUPABASE_URL")!.replace(/\/$/, "")}/functions/v1/router-agent`;
 
   if (route === "setup") {
-    const token = url.searchParams.get("t") ?? "";
+    const token = pathToken ?? url.searchParams.get("t") ?? "";
     const { data, error } = await supabase.rpc("consume_provisioning_token", { _token: token });
     if (error) { console.error("consume failed", error.message); return failScript("setup is unavailable, try again shortly"); }
     if (!data) return failScript("this setup command has expired or was already used. Create a new one in your dashboard");

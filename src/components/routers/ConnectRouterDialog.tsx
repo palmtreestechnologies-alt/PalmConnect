@@ -78,7 +78,7 @@ export function ConnectRouterDialog({ open, onOpenChange, onCreated }: Props) {
     }
     setRouterId(row.id);
     setCommand(
-      `/tool fetch url="${SUPABASE_URL}/functions/v1/router-agent/setup?t=${token}" check-certificate=no dst-path=palm.rsc; :delay 2s; /import palm.rsc`,
+      `/tool fetch url="${SUPABASE_URL}/functions/v1/router-agent/setup/${token}" check-certificate=no dst-path=palm.rsc; :delay 2s; /import palm.rsc`,
     );
     onCreated();
   }

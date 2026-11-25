@@ -3,7 +3,7 @@
 The owner clicks **Connect a MikroTik**, enters a router name, the guest port (e.g. `ether5`) and a guest network, and pastes one command into the router's terminal:
 
 ```
-/tool fetch url="https://<project>.supabase.co/functions/v1/router-agent/setup?t=<token>" check-certificate=no dst-path=palm.rsc; :delay 2s; /import palm.rsc
+/tool fetch url="https://<project>.supabase.co/functions/v1/router-agent/setup/<token>" check-certificate=no dst-path=palm.rsc; :delay 2s; /import palm.rsc
 ```
 
 ## What happens
