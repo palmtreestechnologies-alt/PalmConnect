@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { Logo } from "@/components/Logo";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { PasswordInput } from "@/components/auth/PasswordInput";
 import { GoogleButton, OrDivider } from "@/components/auth/GoogleButton";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
@@ -106,7 +107,7 @@ export default function Register() {
               </Select>
             </div>
             <div className="space-y-1.5"><Label>Email</Label><Input type="email" value={form.email} onChange={(e) => set("email", e.target.value)} required /></div>
-            <div className="space-y-1.5"><Label>Password</Label><Input type="password" value={form.password} onChange={(e) => set("password", e.target.value)} required minLength={8}/></div>
+            <div className="space-y-1.5"><Label htmlFor="reg-password">Password</Label><PasswordInput id="reg-password" autoComplete="new-password" value={form.password} onChange={(e) => set("password", e.target.value)} required minLength={8}/></div>
             <Button type="submit" className="w-full" variant="hero" disabled={loading}>
               {loading ? <Loader2 className="h-4 w-4 animate-spin"/> : "Create account"}
             </Button>
