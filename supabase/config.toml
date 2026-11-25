@@ -17,3 +17,6 @@ verify_jwt = true
 
 [functions.router-agent]
 verify_jwt = false
+
+[functions.send-guest-sms]
+verify_jwt = true

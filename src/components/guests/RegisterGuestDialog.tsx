@@ -4,16 +4,16 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Copy, Loader2, MessageCircle } from "lucide-react";
+import { Copy, Loader2, MessageCircle, MessageSquareText } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
 import {
-  generatePassword, generateUsername, normalizePhone, stayToMs, STAY_LIMITS, type StayUnit,
+  generatePassword, generateUsername, normalizePhone, sendGuestSms, SPEED_OPTIONS, stayToMs, STAY_LIMITS, type StayUnit,
 } from "@/lib/guestLogin";
 
-type Issued = { username: string; password: string; phone: string; devices: number; expires: string };
-const FORM0 = { phone: "", devices: "1", amount: "1", unit: "days" as StayUnit };
+type Issued = { id: string; username: string; password: string; phone: string; devices: number; expires: string };
+const FORM0 = { phone: "", devices: "1", amount: "1", unit: "days" as StayUnit, speed: "none" };
 
 /** One-step guest registration: phone, devices, stay. Username and password are generated. */
 export function RegisterGuestDialog({
@@ -23,10 +23,12 @@ export function RegisterGuestDialog({
   const [form, setForm] = useState(FORM0);
   const [saving, setSaving] = useState(false);
   const [issued, setIssued] = useState<Issued | null>(null);
+  const [texting, setTexting] = useState(false);
+  const [texted, setTexted] = useState(false);
 
   function close(o: boolean) {
     onOpenChange(o);
-    if (!o) { setIssued(null); setForm(FORM0); }
+    if (!o) { setIssued(null); setTexted(false); setForm(FORM0); }
   }
 
   async function submit(e: React.FormEvent) {
@@ -47,11 +49,13 @@ export function RegisterGuestDialog({
         business_id: businessId, created_by: user?.id, status: "unused", expires_at: expires,
         username: generateUsername(), password: generatePassword(),
         guest_phone: phone, device_limit: devices,
+        speed_kbps: SPEED_OPTIONS.find((o) => o.value === form.speed)?.kbps ?? null,
       };
-      const { error } = await supabase.from("vouchers").insert(row);
-      if (!error) {
+      const { data, error } = await supabase.from("vouchers").insert(row).select("id").single();
+      if (!error && data) {
         setSaving(false);
-        setIssued({ username: row.username, password: row.password, phone, devices, expires });
+        setTexted(false);
+        setIssued({ id: data.id, username: row.username, password: row.password, phone, devices, expires });
         onDone?.();
         return;
       }
@@ -59,6 +63,16 @@ export function RegisterGuestDialog({
     }
     setSaving(false);
     toast.error("Could not create a unique login. Please try again.");
+  }
+
+  async function text() {
+    if (!issued) return;
+    setTexting(true);
+    const err = await sendGuestSms(issued.id);
+    setTexting(false);
+    if (err) return toast.error(err);
+    setTexted(true);
+    toast.success("SMS sent");
   }
 
   const message = issued
@@ -81,6 +95,10 @@ export function RegisterGuestDialog({
                 Up to {issued.devices} device{issued.devices > 1 ? "s" : ""} · valid until {new Date(issued.expires).toLocaleString()}
               </p>
             </div>
+            <Button variant="outline" className="w-full" onClick={text} disabled={texting}>
+              {texting ? <Loader2 className="h-4 w-4 animate-spin" /> : <MessageSquareText className="h-4 w-4" />}
+              {texted ? "Send SMS again" : "Send by SMS"}
+            </Button>
             <div className="grid grid-cols-2 gap-2">
               <Button variant="outline" onClick={() => { navigator.clipboard.writeText(message); toast.success("Copied"); }}>
                 <Copy className="h-4 w-4" /> Copy
@@ -120,6 +138,15 @@ export function RegisterGuestDialog({
                   </Select>
                 </div>
               </div>
+            </div>
+            <div className="space-y-1.5">
+              <Label>Speed limit <span className="text-muted-foreground font-normal">(optional)</span></Label>
+              <Select value={form.speed} onValueChange={(v) => setForm({ ...form, speed: v })}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  {SPEED_OPTIONS.map((o) => <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>)}
+                </SelectContent>
+              </Select>
             </div>
             <Button type="submit" className="w-full" variant="hero" disabled={saving}>
               {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : null} Create login

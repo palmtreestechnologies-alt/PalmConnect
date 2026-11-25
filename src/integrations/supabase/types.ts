@@ -1236,6 +1236,7 @@ export type Database = {
           device_limit: number | null
           guest_name: string | null
           guest_phone: string | null
+          speed_kbps: number | null
           room: string | null
           batch_id: string | null
           business_id: string
@@ -1255,6 +1256,7 @@ export type Database = {
           device_limit?: number | null
           guest_name?: string | null
           guest_phone?: string | null
+          speed_kbps?: number | null
           room?: string | null
           batch_id?: string | null
           business_id: string
@@ -1274,6 +1276,7 @@ export type Database = {
           device_limit?: number | null
           guest_name?: string | null
           guest_phone?: string | null
+          speed_kbps?: number | null
           room?: string | null
           batch_id?: string | null
           business_id?: string

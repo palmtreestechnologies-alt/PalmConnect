@@ -1,3 +1,5 @@
+import { supabase } from "@/integrations/supabase/client";
+
 // Helpers for the one-step guest registration (phone + devices + stay).
 
 const ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; // no 0/O/1/I/L: easy to read out and type
@@ -31,3 +33,30 @@ export function stayToMs(amount: number, unit: StayUnit) {
   return amount * (unit === "days" ? 24 : 1) * 3600_000;
 }
 export const STAY_LIMITS = { hours: 72, days: 90 } as const;
+
+export const SPEED_OPTIONS = [
+  { value: "none", label: "No limit", kbps: null },
+  { value: "1024", label: "1 Mbps", kbps: 1024 },
+  { value: "2048", label: "2 Mbps", kbps: 2048 },
+  { value: "5120", label: "5 Mbps", kbps: 5120 },
+  { value: "10240", label: "10 Mbps", kbps: 10240 },
+  { value: "20480", label: "20 Mbps", kbps: 20480 },
+] as const;
+
+const SMS_ERRORS: Record<string, string> = {
+  sms_not_configured: "SMS is not switched on yet. Use Copy or WhatsApp for now.",
+  no_phone: "This login has no phone number.",
+  expired: "This login has already expired.",
+  limit_voucher: "This login has already been texted 3 times.",
+  limit_daily: "Daily SMS limit reached. Try again tomorrow.",
+  provider_failed: "The SMS could not be delivered. Check the number and try again.",
+};
+
+/** Texts the guest their login. Returns an error message, or null on success. */
+export async function sendGuestSms(voucherId: string): Promise<string | null> {
+  const { error } = await supabase.functions.invoke("send-guest-sms", { body: { voucher_id: voucherId } });
+  if (!error) return null;
+  let code = "";
+  try { code = (await (error as any).context.json()).error ?? ""; } catch { /* network error */ }
+  return SMS_ERRORS[code] ?? "Could not send the SMS. Please try again.";
+}

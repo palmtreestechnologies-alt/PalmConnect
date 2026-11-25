@@ -8,12 +8,12 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Ticket as TicketIcon, Download, Search } from "lucide-react";
+import { Plus, Ticket as TicketIcon, Download, Search, MessageSquareText } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
 import { RegisterGuestDialog } from "@/components/guests/RegisterGuestDialog";
-import { randomCode as rand } from "@/lib/guestLogin";
+import { randomCode as rand, sendGuestSms } from "@/lib/guestLogin";
 import QRCode from "qrcode";
 import jsPDF from "jspdf";
 
@@ -142,7 +142,7 @@ export default function Vouchers() {
         ) : (
           <Card className="bg-card-grad overflow-hidden">
             <Table>
-              <TableHeader><TableRow><TableHead>Guest phone</TableHead><TableHead>Username</TableHead><TableHead>Password</TableHead><TableHead>Devices</TableHead><TableHead>Package</TableHead><TableHead>Status</TableHead><TableHead>Expires</TableHead><TableHead>Created</TableHead></TableRow></TableHeader>
+              <TableHeader><TableRow><TableHead>Guest phone</TableHead><TableHead>Username</TableHead><TableHead>Password</TableHead><TableHead>Devices</TableHead><TableHead>Speed</TableHead><TableHead>Package</TableHead><TableHead>Status</TableHead><TableHead>Expires</TableHead><TableHead>Created</TableHead><TableHead className="w-12"/></TableRow></TableHeader>
               <TableBody>
                 {filtered.map((v) => (
                   <TableRow key={v.id}>
@@ -150,6 +150,7 @@ export default function Vouchers() {
                     <TableCell className="font-mono font-semibold">{v.username}</TableCell>
                     <TableCell className="font-mono">{v.password}</TableCell>
                     <TableCell>{v.device_limit ?? v.packages?.device_limit ?? 1}</TableCell>
+                    <TableCell className="text-sm text-muted-foreground">{v.speed_kbps ? `${v.speed_kbps/1024} Mbps` : v.packages?.name ? "Package" : "No limit"}</TableCell>
                     <TableCell>{v.packages?.name ?? "—"}</TableCell>
                     <TableCell>
                       <Badge variant="secondary" className={
@@ -160,6 +161,14 @@ export default function Vouchers() {
                     </TableCell>
                     <TableCell className="text-sm text-muted-foreground">{v.expires_at ? new Date(v.expires_at).toLocaleString() : "—"}</TableCell>
                     <TableCell className="text-sm text-muted-foreground">{new Date(v.created_at).toLocaleDateString()}</TableCell>
+                    <TableCell>
+                      {v.guest_phone && v.status !== "expired" && (
+                        <Button variant="ghost" size="icon" className="h-8 w-8" aria-label="Send login by SMS" title="Send login by SMS"
+                          onClick={async()=>{ const e = await sendGuestSms(v.id); e ? toast.error(e) : toast.success("SMS sent"); }}>
+                          <MessageSquareText className="h-4 w-4"/>
+                        </Button>
+                      )}
+                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
