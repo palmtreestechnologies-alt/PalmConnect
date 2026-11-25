@@ -10,6 +10,8 @@ import Packages from "@/pages/dashboard/Packages";
 import Vouchers from "@/pages/dashboard/Vouchers";
 import StaffAccess from "@/pages/dashboard/StaffAccess";
 import { BrandingProvider } from "@/components/brand/BrandingProvider";
+import ForgotPassword from "@/pages/ForgotPassword";
+import ResetPassword from "@/pages/ResetPassword";
 import Welcome from "@/pages/Welcome";
 import Branding from "@/pages/dashboard/Branding";
 import Settings from "@/pages/dashboard/Settings";
@@ -33,6 +35,8 @@ export function AppRouter() {
         <Route path="/" element={<Landing />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/dashboard" element={<ProtectedRoute><Overview /></ProtectedRoute>} />
         <Route path="/dashboard/routers" element={<ProtectedRoute><Routers /></ProtectedRoute>} />
         <Route path="/dashboard/packages" element={<ProtectedRoute><Packages /></ProtectedRoute>} />
