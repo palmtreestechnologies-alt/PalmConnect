@@ -87,18 +87,27 @@ export function buildSyncSource(p: { baseUrl: string; routerId: string; agentKey
   ].join("\n");
 }
 
+/** Interface name meaning "every port except ether1, plus Wi-Fi": a bridge the script builds. */
+export const BRIDGE_IFACE = "palm-bridge";
+
+// Adds every matching interface to the guest bridge. Interfaces already in another bridge are left alone (and reported).
+const addPorts = (menu: string, filter: string) =>
+  `:do {:foreach i in=[/interface ${menu} find${filter}] do={:local n [/interface ${menu} get $i name]; :if ([:len [/interface bridge port find interface=$n bridge=${BRIDGE_IFACE}]]=0) do={:if ([:len [/interface bridge port find interface=$n]]>0) do={:put "Palm Connect: $n is already in another bridge and was left alone"} else={/interface bridge port add bridge=${BRIDGE_IFACE} interface=$n comment=palm-hotspot}}}} on-error={}`;
+
 export function buildSetupScript(p: SetupParams): string {
   if (!/^[A-Za-z0-9._-]{1,15}$/.test(p.iface)) throw new Error("bad interface");
+  const bridge = p.iface === BRIDGE_IFACE;
   const c = cidrPlan(p.cidr);
   const name = safeLabel(p.routerName) || "router";
   return [
     `# Palm Connect setup for ${name}`,
     ':log info "Palm Connect: setup started"',
-    `:if ([:len [/interface find name="${p.iface}"]]=0) do={:put "Palm Connect: interface ${p.iface} was not found on this router. Check the name and paste the command again. Nothing was changed."; :error "interface not found"}`,
+    ...(bridge ? [] : [`:if ([:len [/interface find name="${p.iface}"]]=0) do={:put "Palm Connect: interface ${p.iface} was not found on this router. Check the name and paste the command again. Nothing was changed."; :error "interface not found"}`]),
     `:if ([:len [/ip hotspot find interface="${p.iface}" name!="palm-hotspot"]]>0) do={:put "Palm Connect: a different hotspot already runs on ${p.iface}. Nothing was changed."; :error "hotspot exists"}`,
     ':put "Palm Connect: saving a backup (palm-pre-setup) ..."',
     '/system backup save name=palm-pre-setup',
     '/export file=palm-pre-setup',
+    ...(bridge ? [`:if ([:len [/interface bridge find name=${BRIDGE_IFACE}]]=0) do={/interface bridge add name=${BRIDGE_IFACE} comment=palm-hotspot}`] : []),
     '/ip hotspot remove [find name=palm-hotspot]',
     '/ip hotspot profile remove [find name=palm-profile]',
     '/ip dhcp-server remove [find name=palm-dhcp]',
@@ -119,6 +128,13 @@ export function buildSetupScript(p: SetupParams): string {
     '/system scheduler remove [find name=palm-sync]',
     `/system scheduler add name=palm-sync interval=1m start-time=startup on-event="/system script run palm-sync" policy=${POLICY}`,
     '/system script run palm-sync',
+    // Ports join the bridge last: if the connection you pasted this over drops for a moment, setup is already done.
+    ...(bridge ? [
+      ':put "Palm Connect: adding ports to the guest network ..."',
+      addPorts("ethernet", ' where name!="ether1"'),
+      addPorts("wireless", ""),
+      addPorts("wifi", ""),
+    ] : []),
     ':log info "Palm Connect: setup complete"',
     ':put "Palm Connect: setup complete. This router will appear as Online in your dashboard within a minute."',
     "",

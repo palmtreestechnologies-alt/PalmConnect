@@ -183,7 +183,7 @@ export function RouterTelemetrySheet({ router, onOpenChange }: Props) {
                 )}
               </SheetTitle>
               <SheetDescription className="font-mono text-xs">
-                {router.connection_mode === "agent" ? `${router.model ?? "MikroTik"} · ${router.hotspot_interface ?? ""}` : `${router.host}:${router.api_port}`}
+                {router.connection_mode === "agent" ? `${router.model ?? "MikroTik"} · ${router.hotspot_interface === "palm-bridge" ? "all ports except ether1" : router.hotspot_interface ?? ""}` : `${router.host}:${router.api_port}`}
                 {t?.firmware ? ` · ${t.firmware}` : ""}
               </SheetDescription>
             </SheetHeader>

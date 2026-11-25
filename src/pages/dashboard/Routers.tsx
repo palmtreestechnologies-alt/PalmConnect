@@ -224,7 +224,7 @@ export default function Routers() {
                     <TableRow key={r.id}>
                       <TableCell className="font-semibold">{r.name}</TableCell>
                       <TableCell className="font-mono text-sm">
-                        {r.connection_mode === "agent" ? `${r.model ?? "MikroTik"} · ${r.hotspot_interface ?? ""}` : `${r.host}:${r.api_port}`}
+                        {r.connection_mode === "agent" ? `${r.model ?? "MikroTik"} · ${r.hotspot_interface === "palm-bridge" ? "all ports except ether1" : r.hotspot_interface ?? ""}` : `${r.host}:${r.api_port}`}
                       </TableCell>
                       <TableCell>
                         <Badge

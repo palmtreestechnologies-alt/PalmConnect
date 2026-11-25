@@ -17,12 +17,15 @@ interface Props {
 
 const NETWORKS = ["192.168.88.0/24", "10.10.0.0/24", "172.16.10.0/24"];
 const IFACE = /^[A-Za-z0-9._-]{1,15}$/;
+const ALL_PORTS = "palm-bridge"; // every port except ether1, plus Wi-Fi
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL as string;
 
 export function ConnectRouterDialog({ open, onOpenChange, onCreated }: Props) {
   const { businessId } = useAuth();
   const [name, setName] = useState("");
-  const [iface, setIface] = useState("");
+  const [allPorts, setAllPorts] = useState(true);
+  const [single, setSingle] = useState("");
+  const [ssid, setSsid] = useState("");
   const [cidr, setCidr] = useState(NETWORKS[0]);
   const [saving, setSaving] = useState(false);
   const [routerId, setRouterId] = useState<string | null>(null);
@@ -32,10 +35,11 @@ export function ConnectRouterDialog({ open, onOpenChange, onCreated }: Props) {
   const timer = useRef<number>();
 
   const nameErr = name.trim().length < 2 ? "Enter a name, for example Reception." : "";
+  const iface = allPorts ? ALL_PORTS : single;
   const ifaceErr = IFACE.test(iface) ? "" : "Use the exact interface name from WinBox, for example ether5 or wlan1.";
 
   function reset() {
-    setName(""); setIface(""); setCidr(NETWORKS[0]); setRouterId(null); setCommand(""); setConnected(false); setCopied(false);
+    setName(""); setAllPorts(true); setSingle(""); setSsid(""); setCidr(NETWORKS[0]); setRouterId(null); setCommand(""); setConnected(false); setCopied(false);
   }
 
   // After the command is shown, check every 5 seconds whether the router has called in.
@@ -102,14 +106,26 @@ export function ConnectRouterDialog({ open, onOpenChange, onCreated }: Props) {
               <Input id="r-name" value={name} onChange={(e) => setName(e.target.value)} placeholder="Reception" />
               {name && nameErr && <p className="text-sm text-destructive">{nameErr}</p>}
             </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="r-if">Guest Wi-Fi port</Label>
-              <Input id="r-if" value={iface} onChange={(e) => setIface(e.target.value.trim())} placeholder="ether5" />
-              <p className="text-sm text-muted-foreground">
-                The port or Wi-Fi interface guests connect to. Do not use the port your internet comes in on, or the one you use to manage the router.
-              </p>
-              {iface && ifaceErr && <p className="text-sm text-destructive">{ifaceErr}</p>}
-            </div>
+            <fieldset className="space-y-2">
+              <legend className="text-sm font-medium">Which ports are for guests and staff?</legend>
+              <label className="flex items-start gap-2 text-sm">
+                <input type="radio" name="r-ports" className="mt-1" checked={allPorts} onChange={() => setAllPorts(true)} />
+                <span><b>All ports except ether1</b> (recommended)<br />
+                  <span className="text-muted-foreground">ether1 is your internet from the modem. Every other port and the router's Wi-Fi join the guest network.</span></span>
+              </label>
+              <label className="flex items-start gap-2 text-sm">
+                <input type="radio" name="r-ports" className="mt-1" checked={!allPorts} onChange={() => setAllPorts(false)} />
+                <span><b>One port only</b> (advanced)</span>
+              </label>
+              {!allPorts && (
+                <div className="space-y-1.5 pl-6">
+                  <Label htmlFor="r-if">Port name</Label>
+                  <Input id="r-if" value={single} onChange={(e) => setSingle(e.target.value.trim())} placeholder="ether5" />
+                  <p className="text-sm text-muted-foreground">Use the exact name from WinBox. Not the internet port, and not the one you manage the router from.</p>
+                  {single && ifaceErr && <p className="text-sm text-destructive">{ifaceErr}</p>}
+                </div>
+              )}
+            </fieldset>
             <div className="space-y-1.5">
               <Label htmlFor="r-net">Guest network</Label>
               <select id="r-net" className="h-10 w-full rounded-md border bg-background px-3 text-sm" value={cidr} onChange={(e) => setCidr(e.target.value)}>
@@ -144,6 +160,14 @@ export function ConnectRouterDialog({ open, onOpenChange, onCreated }: Props) {
           <div className="space-y-4 text-center">
             <CheckCircle2 className="mx-auto h-10 w-10 text-green-600" />
             <p className="font-medium">{name} is connected.</p>
+            {allPorts && (
+              <div className="space-y-2 text-left">
+                <p className="text-sm text-muted-foreground">To switch on the router's Wi-Fi for guests, enter a Wi-Fi name and paste this in the terminal.</p>
+                <Input value={ssid} onChange={(e) => setSsid(e.target.value.replace(/[^A-Za-z0-9 _-]/g, "").slice(0, 32))} placeholder="Wi-Fi name, e.g. Hotel Guest" aria-label="Wi-Fi name" />
+                <Textarea readOnly rows={3} className="font-mono text-xs" onFocus={(e) => e.currentTarget.select()}
+                  value={`/interface wireless set [find default-name=wlan1] mode=ap-bridge ssid="${ssid || "Guest WiFi"}" country=kenya disabled=no`} />
+              </div>
+            )}
             <Button className="w-full" onClick={() => { onOpenChange(false); reset(); }}>Done</Button>
           </div>
         )}

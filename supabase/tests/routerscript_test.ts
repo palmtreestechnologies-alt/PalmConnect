@@ -1,4 +1,4 @@
-import { buildSetupScript, buildSyncSource, cidrPlan, formatPull, parseUptime, rosEscape, profileName } from "../functions/_shared/routerscript.ts";
+import { BRIDGE_IFACE, buildSetupScript, buildSyncSource, cidrPlan, formatPull, parseUptime, rosEscape, profileName } from "../functions/_shared/routerscript.ts";
 let fails = 0;
 const t = (n: string, ok: boolean, extra = "") => { console.log((ok ? "PASS  " : "FAIL  ") + n + (ok ? "" : " " + extra)); if (!ok) fails++; };
 const eq = (n: string, a: unknown, b: unknown) => t(n, JSON.stringify(a) === JSON.stringify(b), `got ${JSON.stringify(a)} want ${JSON.stringify(b)}`);
@@ -27,6 +27,14 @@ t("source block has no raw quote, dollar or bracket", !/["$\[\]]/.test(block.rep
 for (const bad of [{ iface: 'x";/system reset' }, { iface: "a".repeat(16) }, { cidr: "8.8.8.0/24" }, { agentKey: "short" }, { baseUrl: "http://evil" }, { baseUrl: 'https://a.co"; /x' }]) {
   let threw = false; try { buildSetupScript({ ...P, ...bad }); } catch { threw = true; } t("setup rejects " + JSON.stringify(bad).slice(0, 40), threw);
 }
+const B = buildSetupScript({ ...P, iface: BRIDGE_IFACE });
+t("bridge mode creates the bridge", B.includes("/interface bridge add name=palm-bridge"));
+t("bridge mode skips the single-interface check", !B.includes("interface find name="));
+t("bridge mode excludes ether1", B.includes('name!="ether1"'));
+t("bridge mode adds ports after the scheduler and sync", B.indexOf("bridge port add") > B.indexOf("/system scheduler add") && B.indexOf("bridge port add") > B.indexOf("/system script run palm-sync"));
+t("bridge mode hotspot sits on the bridge", B.includes('/ip hotspot add name=palm-hotspot interface="palm-bridge"'));
+t("bridge mode lines are short", B.split("\n").every((l) => l.length < 460), String(Math.max(...B.split("\n").map((l) => l.length))));
+t("single-port mode has no bridge", !s.includes("bridge port add") && !s.includes("interface bridge add"));
 const items = [
   { s: 5, u: "room12", p: "Abcd1234", d: 3, down: 5000, up: 2000, mb: null, on: true },
   { s: 6, u: "late99", p: "Qwer1234", d: 1, down: null, up: null, mb: 500, on: false },

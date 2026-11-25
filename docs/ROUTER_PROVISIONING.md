@@ -27,7 +27,7 @@ Works behind NAT on RouterOS 6 and 7: the router always calls out; nothing conne
 - No firewall hardening, NTP or monitoring changes are made yet. Deliberately minimal for a first hardware test.
 
 ## Test on the RB2011 (after you back up and reset it)
-1. Reset it, give it internet on `ether1`, connect your laptop to `ether2` to manage it, and use `ether4` as the guest port. Never use the port you manage it from or the internet port.
+1. Reset it and give it internet on `ether1` (modem/ISP). Choose **All ports except ether1** in the dialog: the script builds a bridge `palm-bridge` from every other port and the Wi-Fi radio, and runs the hotspot on it. Ports join the bridge last, so a brief drop of your WinBox session at the end is expected; setup is already complete by then. The Wi-Fi radio is added to the bridge but not configured; the dialog shows the one command to switch it on. In single-port mode, never use the internet port or the port you manage from.
 2. Deploy the migrations and the `router-agent` function (see `SECURITY_FIXES.md`).
 3. In the dashboard: Connect a MikroTik, name `Test`, port `ether4`, paste the command in a WinBox terminal.
 4. Expected: "setup complete" in the terminal; router shows Online in the dashboard within a minute.
