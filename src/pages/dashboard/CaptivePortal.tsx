@@ -28,7 +28,7 @@ type Biz = {
 const DEFAULTS: Biz = {
   name: "My Business",
   logo_url: null,
-  primary_color: "#0B3B2B",
+  primary_color: "#061650",
   welcome_message: "",
   terms_and_conditions: "",
   redirect_url_after_purchase: "",

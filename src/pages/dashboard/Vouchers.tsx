@@ -61,7 +61,7 @@ export default function Vouchers() {
     const list = filtered.slice(0, 60);
     if (list.length === 0) { toast.error("No vouchers"); return; }
     const doc = new jsPDF({ unit: "mm", format: "a4" });
-    const col = brand.primary ?? "#0B3B2B";
+    const col = brand.primary ?? "#061650";
     const [pr, pg, pb] = hexToRgb(col);
     const onCol = readableOn(col) === "dark" ? [255, 255, 255] : [20, 20, 20];
     let logo: { data: string; w: number; h: number } | null = null;

@@ -14,7 +14,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
 import { Loader2, RotateCcw, Save, Trash2, Upload, Wifi } from "lucide-react";
 
-const DEFAULT = { primary: "#0B3B2B", accent: "#E8B53A" };
+const DEFAULT = { primary: "#061650", accent: "#E4B24A" };
 const TYPES: Record<string, string> = { "image/png": "png", "image/jpeg": "jpg", "image/webp": "webp" };
 
 type State = { name: string; logo_url: string | null; primary: string | null; accent: string | null; welcome: string | null; language: string };
@@ -35,7 +35,7 @@ function ColorField({ id, label, value, fallback, onChange }: { id: string; labe
           if (HEX.test(v)) onChange(v.toUpperCase());
         }} />
       </div>
-      {!HEX.test(text) && <p className="text-xs text-destructive">Use a code like #0B3B2B.</p>}
+      {!HEX.test(text) && <p className="text-xs text-destructive">Use a code like #061650.</p>}
     </div>
   );
 }

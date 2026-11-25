@@ -100,7 +100,7 @@ export function clearBrand() {
 
 /** Starting points that are already tested for readable text. */
 export const PRESETS: { name: string; primary: string; accent: string }[] = [
-  { name: "Palm Connect", primary: "#0B3B2B", accent: "#E8B53A" },
+  { name: "Palm Connect", primary: "#061650", accent: "#E4B24A" },
   { name: "Ocean", primary: "#0B4F6C", accent: "#F2A541" },
   { name: "Sunset", primary: "#7A2E1D", accent: "#F4B942" },
   { name: "Berry", primary: "#5B2A5E", accent: "#F28DB2" },
