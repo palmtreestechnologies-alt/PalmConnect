@@ -1,3 +1,4 @@
+import { useSearchParams } from "react-router-dom";
 import { useEffect, useMemo, useState } from "react";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 import { Card } from "@/components/ui/card";
@@ -64,7 +65,8 @@ type Filter = "all" | "online" | "offline";
 export default function Routers() {
   const { businessId } = useAuth();
   const [routers, setRouters] = useState<RouterRow[]>([]);
-  const [open, setOpen] = useState(false);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [open, setOpen] = useState(searchParams.get("connect") === "1");
   const [selected, setSelected] = useState<RouterRow | null>(null);
   const [filter, setFilter] = useState<Filter>("all");
   const [search, setSearch] = useState("");
@@ -158,7 +160,7 @@ export default function Routers() {
               <Plus className="h-4 w-4" /> Connect a MikroTik
             </Button>
           </div>
-          <ConnectRouterDialog open={open} onOpenChange={setOpen} onCreated={load} />
+          <ConnectRouterDialog open={open} onOpenChange={(o) => { setOpen(o); if (!o && searchParams.has("connect")) { searchParams.delete("connect"); setSearchParams(searchParams, { replace: true }); } }} onCreated={load} />
         </div>
 
         <Tabs value={filter} onValueChange={(v) => setFilter(v as Filter)}>

@@ -1,4 +1,4 @@
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import Landing from "@/pages/Landing";
 import Login from "@/pages/Login";
 import Register from "@/pages/Register";
@@ -6,7 +6,6 @@ import NotFound from "@/pages/NotFound";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import Overview from "@/pages/dashboard/Overview";
 import Routers from "@/pages/dashboard/Routers";
-import Packages from "@/pages/dashboard/Packages";
 import Vouchers from "@/pages/dashboard/Vouchers";
 import StaffAccess from "@/pages/dashboard/StaffAccess";
 import { BrandingProvider } from "@/components/brand/BrandingProvider";
@@ -39,7 +38,7 @@ export function AppRouter() {
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/dashboard" element={<ProtectedRoute><Overview /></ProtectedRoute>} />
         <Route path="/dashboard/routers" element={<ProtectedRoute><Routers /></ProtectedRoute>} />
-        <Route path="/dashboard/packages" element={<ProtectedRoute><Packages /></ProtectedRoute>} />
+        <Route path="/dashboard/packages" element={<Navigate to="/dashboard/vouchers" replace />} />
         <Route path="/dashboard/vouchers" element={<ProtectedRoute><Vouchers /></ProtectedRoute>} />
         <Route path="/dashboard/staff-access" element={<ProtectedRoute><StaffAccess /></ProtectedRoute>} />
         <Route path="/dashboard/users" element={<ProtectedRoute><HotspotUsers /></ProtectedRoute>} />

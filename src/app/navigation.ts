@@ -33,21 +33,15 @@ export const primaryNav: NavItem[] = [
       { title: "Staff Access", url: "/dashboard/staff-access", icon: UserCog },
     ],
   },
-  {
-    title: "Networking", url: "/dashboard/routers", icon: Network,
-    children: [
-      { title: "Routers", url: "/dashboard/routers", icon: Router },
-      { title: "Branding", url: "/dashboard/branding", icon: Brush },
-      { title: "Captive Portal", url: "/dashboard/portal", icon: Palette },
-      { title: "Network Check", url: "/dashboard/network-check", icon: Network },
-    ],
-  },
+  { title: "Routers", url: "/dashboard/routers", icon: Router },
+  { title: "Branding", url: "/dashboard/branding", icon: Brush },
+  { title: "Guest Login Page", url: "/dashboard/portal", icon: Palette },
+  { title: "Network Check", url: "/dashboard/network-check", icon: Network },
   { title: "Analytics", url: "/dashboard/analytics", icon: BarChart3 },
   {
     title: "Billing", url: "/dashboard/billing", icon: CreditCard,
     children: [
       { title: "Subscription", url: "/dashboard/billing", icon: CreditCard },
-      { title: "Packages", url: "/dashboard/packages", icon: Package },
       { title: "Vouchers", url: "/dashboard/vouchers", icon: Ticket },
     ],
   },

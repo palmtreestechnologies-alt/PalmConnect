@@ -102,7 +102,9 @@ export default function Vouchers() {
       doc.setFontSize(13); doc.setFont("courier", "bold");
       doc.text(v.password, x + 4, y + 36);
       doc.setFontSize(7); doc.setFont("helvetica", "normal"); doc.setTextColor(110,110,110);
-      doc.text(`Duration: ${v.packages?.name ?? ""} • One-device only`, x + 4, y + 45);
+      const devices = v.device_limit ?? v.packages?.device_limit ?? 1;
+      const until = v.expires_at ? new Date(v.expires_at).toLocaleString("en-KE", { dateStyle: "medium", timeStyle: "short" }) : null;
+      doc.text(`${devices} ${devices === 1 ? "device" : "devices"}${until ? ` • Valid until ${until}` : ""}`, x + 4, y + 45);
       doc.setTextColor(20,20,20);
       x += cardW + gap;
       if (x + cardW > 210 - marginX) { x = marginX; y += cardH + gap; }
@@ -128,27 +130,6 @@ export default function Vouchers() {
             <Button variant="outline" onClick={exportPDF} disabled={filtered.length===0}><Download className="h-4 w-4"/>Export PDF</Button>
             <Button variant="hero" onClick={()=>setGuestOpen(true)}><Plus className="h-4 w-4"/>Register guest</Button>
             <RegisterGuestDialog open={guestOpen} onOpenChange={setGuestOpen} onDone={load}/>
-            <Dialog open={open} onOpenChange={setOpen}>
-              <DialogTrigger asChild><Button variant="outline"><Plus className="h-4 w-4"/>Bulk generate</Button></DialogTrigger>
-              <DialogContent>
-                <DialogHeader><DialogTitle>Bulk generate vouchers</DialogTitle></DialogHeader>
-                <form onSubmit={generate} className="space-y-3">
-                  <div className="space-y-1.5">
-                    <Label>Package</Label>
-                    <Select value={bulk.package_id} onValueChange={(v)=>setBulk({...bulk, package_id: v})}>
-                      <SelectTrigger><SelectValue placeholder="Choose package"/></SelectTrigger>
-                      <SelectContent>{packages.map((p) => <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>)}</SelectContent>
-                    </Select>
-                    {packages.length===0 && <p className="text-xs text-warning">Create a package first.</p>}
-                  </div>
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="space-y-1.5"><Label>Count (max 500)</Label><Input type="number" min={1} max={500} value={bulk.count} onChange={(e)=>setBulk({...bulk,count:e.target.value})}/></div>
-                    <div className="space-y-1.5"><Label>Prefix</Label><Input maxLength={4} value={bulk.prefix} onChange={(e)=>setBulk({...bulk,prefix:e.target.value.toUpperCase()})}/></div>
-                  </div>
-                  <Button type="submit" className="w-full" variant="hero" disabled={packages.length===0}>Generate</Button>
-                </form>
-              </DialogContent>
-            </Dialog>
           </div>
         </div>
 
@@ -166,7 +147,7 @@ export default function Vouchers() {
         ) : (
           <Card className="bg-card-grad overflow-hidden">
             <Table>
-              <TableHeader><TableRow><TableHead>Guest phone</TableHead><TableHead>Username</TableHead><TableHead>Password</TableHead><TableHead>Devices</TableHead><TableHead>Speed</TableHead><TableHead>Package</TableHead><TableHead>Status</TableHead><TableHead>Expires</TableHead><TableHead>Created</TableHead><TableHead className="w-12"/></TableRow></TableHeader>
+              <TableHeader><TableRow><TableHead>Guest phone</TableHead><TableHead>Username</TableHead><TableHead>Password</TableHead><TableHead>Devices</TableHead><TableHead>Speed</TableHead><TableHead>Status</TableHead><TableHead>Expires</TableHead><TableHead>Created</TableHead><TableHead className="w-12"/></TableRow></TableHeader>
               <TableBody>
                 {filtered.map((v) => (
                   <TableRow key={v.id}>
@@ -175,7 +156,6 @@ export default function Vouchers() {
                     <TableCell className="font-mono">{v.password}</TableCell>
                     <TableCell>{v.device_limit ?? v.packages?.device_limit ?? 1}</TableCell>
                     <TableCell className="text-sm text-muted-foreground">{v.speed_kbps ? `${v.speed_kbps/1024} Mbps` : v.packages?.name ? "Package" : "No limit"}</TableCell>
-                    <TableCell>{v.packages?.name ?? "—"}</TableCell>
                     <TableCell>
                       <Badge variant="secondary" className={
                         v.status==="unused" ? "bg-success/15 text-success" :
