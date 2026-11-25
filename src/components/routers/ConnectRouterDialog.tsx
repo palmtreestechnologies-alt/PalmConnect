@@ -15,7 +15,8 @@ interface Props {
   onCreated: () => void;
 }
 
-const NETWORKS = ["192.168.88.0/24", "10.10.0.0/24", "172.16.10.0/24"];
+// 192.168.88.0/24 is MikroTik's own factory LAN, so it is not the default: it clashes on a router that still has its default setup.
+const NETWORKS = ["10.10.0.0/24", "172.16.10.0/24", "192.168.88.0/24"];
 const IFACE = /^[A-Za-z0-9._-]{1,15}$/;
 const ALL_PORTS = "palm-bridge"; // every port except ether1, plus Wi-Fi
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL as string;

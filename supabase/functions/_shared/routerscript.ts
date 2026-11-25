@@ -104,6 +104,8 @@ export function buildSetupScript(p: SetupParams): string {
     ':log info "Palm Connect: setup started"',
     ...(bridge ? [] : [`:if ([:len [/interface find name="${p.iface}"]]=0) do={:put "Palm Connect: interface ${p.iface} was not found on this router. Check the name and paste the command again. Nothing was changed."; :error "interface not found"}`]),
     `:if ([:len [/ip hotspot find interface="${p.iface}" name!="palm-hotspot"]]>0) do={:put "Palm Connect: a different hotspot already runs on ${p.iface}. Nothing was changed."; :error "hotspot exists"}`,
+    `:if ([:len [/ip address find where network=${c.network} comment!="palm-hotspot"]]>0) do={:put "Palm Connect: the range ${c.network}/${c.mask} is already used on this router (for example its factory LAN). Choose another range in your dashboard and paste the new command. Nothing was changed."; :error "range in use"}`,
+    `:if ([:len [/ip dhcp-server network find where address="${c.network}/${c.mask}" comment!="palm-hotspot"]]>0) do={:put "Palm Connect: a DHCP network for ${c.network}/${c.mask} already exists on this router. Choose another range in your dashboard and paste the new command. Nothing was changed."; :error "dhcp network exists"}`,
     ':put "Palm Connect: saving a backup (palm-pre-setup) ..."',
     '/system backup save name=palm-pre-setup',
     '/export file=palm-pre-setup',
