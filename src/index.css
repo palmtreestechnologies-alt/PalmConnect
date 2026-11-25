@@ -1,0 +1,113 @@
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* PalmConnect brand — deep navy + emerald/lime gradient */
+    --background: 0 0% 100%;
+    --foreground: 210 55% 10%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 210 55% 10%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 210 55% 10%;
+
+    /* Deep navy (from wordmark) */
+    --primary: 210 55% 12%;
+    --primary-foreground: 0 0% 100%;
+    --primary-glow: 158 75% 42%;
+
+    /* Vibrant emerald/lime (from logo accent) */
+    --secondary: 152 70% 45%;
+    --secondary-foreground: 210 55% 10%;
+
+    --muted: 200 20% 95%;
+    --muted-foreground: 210 20% 40%;
+
+    --accent: 152 70% 45%;
+    --accent-foreground: 210 55% 10%;
+
+    --destructive: 0 70% 45%;
+    --destructive-foreground: 0 0% 100%;
+
+    --success: 142 60% 35%;
+    --warning: 35 85% 50%;
+
+    --border: 200 20% 88%;
+    --input: 200 20% 88%;
+    --ring: 152 70% 45%;
+
+    --radius: 0.85rem;
+
+    /* Gradients — navy → emerald → lime, mirroring the logo */
+    --gradient-hero: linear-gradient(135deg, hsl(210 60% 8%) 0%, hsl(195 55% 14%) 50%, hsl(158 65% 22%) 100%);
+    --gradient-emerald: linear-gradient(135deg, hsl(210 55% 12%) 0%, hsl(158 70% 30%) 60%, hsl(140 75% 50%) 100%);
+    --gradient-gold: linear-gradient(135deg, hsl(152 70% 45%), hsl(140 80% 55%));
+    --gradient-card: linear-gradient(160deg, hsl(0 0% 100%) 0%, hsl(200 30% 98%) 100%);
+
+    /* Shadows */
+    --shadow-elegant: 0 20px 60px -20px hsl(210 55% 12% / 0.28);
+    --shadow-gold: 0 10px 40px -10px hsl(152 70% 45% / 0.45);
+    --shadow-card: 0 4px 20px -4px hsl(210 55% 10% / 0.08);
+
+    /* Sidebar — deep navy with lime accents */
+    --sidebar-background: 210 60% 9%;
+    --sidebar-foreground: 200 20% 92%;
+    --sidebar-primary: 152 70% 50%;
+    --sidebar-primary-foreground: 210 55% 10%;
+    --sidebar-accent: 210 45% 15%;
+    --sidebar-accent-foreground: 200 20% 95%;
+    --sidebar-border: 210 35% 18%;
+    --sidebar-ring: 152 70% 50%;
+
+    --transition-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .dark {
+    --background: 160 45% 6%;
+    --foreground: 40 30% 95%;
+    --card: 160 40% 10%;
+    --card-foreground: 40 30% 95%;
+    --popover: 160 40% 10%;
+    --popover-foreground: 40 30% 95%;
+    --primary: 158 70% 45%;
+    --primary-foreground: 160 40% 8%;
+    --primary-glow: 158 80% 55%;
+    --secondary: 40 70% 55%;
+    --secondary-foreground: 160 40% 8%;
+    --muted: 158 30% 14%;
+    --muted-foreground: 40 15% 65%;
+    --accent: 40 70% 55%;
+    --accent-foreground: 160 40% 8%;
+    --destructive: 0 70% 50%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 158 30% 18%;
+    --input: 158 30% 18%;
+    --ring: 158 70% 45%;
+    --gradient-card: linear-gradient(160deg, hsl(160 40% 10%) 0%, hsl(158 35% 12%) 100%);
+  }
+}
+
+@layer base {
+  * { @apply border-border; }
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    font-feature-settings: "ss01", "cv11";
+  }
+  h1, h2, h3, h4, h5 { font-family: 'Sora', system-ui, sans-serif; letter-spacing: -0.02em; }
+}
+
+@layer utilities {
+  .bg-hero { background: var(--gradient-hero); }
+  .bg-emerald-grad { background: var(--gradient-emerald); }
+  .bg-gold-grad { background: var(--gradient-gold); }
+  .bg-card-grad { background: var(--gradient-card); }
+  .shadow-elegant { box-shadow: var(--shadow-elegant); }
+  .shadow-gold { box-shadow: var(--shadow-gold); }
+  .shadow-card { box-shadow: var(--shadow-card); }
+  .text-balance { text-wrap: balance; }
+}

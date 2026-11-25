@@ -1,0 +1,1 @@
+DROP POLICY IF EXISTS "Public lookup by ref" ON public.payments;

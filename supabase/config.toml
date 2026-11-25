@@ -1,0 +1,19 @@
+project_id = "mgkptioejwcmuonpacok"
+
+[functions.voucher-status]
+verify_jwt = false
+
+[functions.router-poller]
+verify_jwt = false
+
+[functions.mpesa-callback]
+verify_jwt = false
+
+[functions.payment-status]
+verify_jwt = false
+
+[functions.subscription-checkout]
+verify_jwt = true
+
+[functions.router-agent]
+verify_jwt = false
