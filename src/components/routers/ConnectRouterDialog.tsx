@@ -141,10 +141,15 @@ export function ConnectRouterDialog({ open, onOpenChange, onCreated }: Props) {
 
         {routerId && !connected && (
           <div className="space-y-4">
-            <ol className="list-decimal space-y-1 pl-5 text-sm">
-              <li>Open WinBox or WebFig and connect to the router.</li>
-              <li>Open <b>New Terminal</b>.</li>
-              <li>Paste the command below and press Enter.</li>
+            <ol className="list-decimal space-y-2 pl-5 text-sm">
+              <li>Plug the cable from your modem or internet provider into the port marked <b>ether1</b>.</li>
+              <li>Connect your computer to the router and open <b>WinBox</b>, then click <b>New Terminal</b>.</li>
+              <li>
+                <b>Brand-new or reset router only:</b> paste this first so ether1 gets internet, then press Enter.
+                <Textarea readOnly rows={1} className="mt-1 font-mono text-xs" value="/ip dhcp-client add interface=ether1 disabled=no" onFocus={(e) => e.currentTarget.select()} />
+                <span className="text-xs text-muted-foreground">Already online through ether1? Skip this.</span>
+              </li>
+              <li>Paste the setup command below and press Enter. Wait until it says <b>setup complete</b>.</li>
             </ol>
             <Textarea readOnly value={command} className="font-mono text-xs" rows={5} onFocus={(e) => e.currentTarget.select()} />
             <Button variant="outline" className="w-full" onClick={copy}>
@@ -153,6 +158,7 @@ export function ConnectRouterDialog({ open, onOpenChange, onCreated }: Props) {
             <p className="text-sm text-muted-foreground">
               The command works once and expires in 60 minutes. The router saves a backup named palm-pre-setup before it changes anything.
             </p>
+            <p className="text-sm text-muted-foreground">If the terminal shows an error, copy it and send it to support. Nothing on your router is deleted without a saved backup.</p>
             <p className="flex items-center gap-2 text-sm"><Loader2 className="h-4 w-4 animate-spin" /> Waiting for the router to connect…</p>
           </div>
         )}
@@ -169,6 +175,14 @@ export function ConnectRouterDialog({ open, onOpenChange, onCreated }: Props) {
                   value={`/interface wireless set [find default-name=wlan1] mode=ap-bridge ssid="${ssid || "Guest WiFi"}" country=kenya disabled=no`} />
               </div>
             )}
+            <div className="rounded-lg border bg-muted/40 p-3 text-left text-sm">
+              <p className="font-medium">Test it</p>
+              <ol className="mt-1 list-decimal space-y-1 pl-5 text-muted-foreground">
+                <li>Join the Wi-Fi from your phone.</li>
+                <li>Open any website. The guest login page appears.</li>
+                <li>Register a guest in <b>Vouchers</b> and sign in with the login we create.</li>
+              </ol>
+            </div>
             <Button className="w-full" onClick={() => { onOpenChange(false); reset(); }}>Done</Button>
           </div>
         )}
