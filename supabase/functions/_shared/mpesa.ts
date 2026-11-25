@@ -77,10 +77,10 @@ export function platformCreds(): { env: MpesaEnv; cred: Cred; type: "paybill" | 
   return { env, cred, type: g("PALMTREES_MPESA_TYPE") === "till" ? "till" : "paybill" };
 }
 
-/** Credentials used to confirm a payment. All payments are subscription payments to Palm Trees. */
+/** Credentials used to confirm a payment. All payments (subscriptions, SMS bundles) go to Palm Trees. */
 // deno-lint-ignore no-explicit-any
 export function credsForPayment(_sr: unknown, pay: { metadata: any }): { env: MpesaEnv; cred: Cred } | null {
-  if (pay.metadata?.kind !== "subscription") return null;
+  if (pay.metadata?.kind !== "subscription" && pay.metadata?.kind !== "sms_pack") return null;
   const p = platformCreds();
   return p ? { env: p.env, cred: p.cred } : null;
 }

@@ -37,7 +37,7 @@ Deno.serve(async (req) => {
     const callbackSecret = Deno.env.get("MPESA_CALLBACK_SECRET") ?? "";
     const platform = platformCreds();
     if (!callbackSecret || !platform) {
-      console.error("subscription-checkout: platform M-Pesa or callback secret not configured");
+      console.error("sms-checkout: platform M-Pesa or callback secret not configured");
       return json({ ok: false, message: "Payments are temporarily unavailable" }, 503);
     }
 
