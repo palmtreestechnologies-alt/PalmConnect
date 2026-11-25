@@ -11,6 +11,7 @@ import { PortalPreview } from "@/components/portal/PortalPreview";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
+import { Link } from "react-router-dom";
 import { Save, Send, Loader2, Palette } from "lucide-react";
 
 type Biz = {
@@ -27,7 +28,7 @@ type Biz = {
 const DEFAULTS: Biz = {
   name: "My Business",
   logo_url: null,
-  primary_color: "#0F5132",
+  primary_color: "#0B3B2B",
   welcome_message: "",
   terms_and_conditions: "",
   redirect_url_after_purchase: "",
@@ -50,7 +51,7 @@ export default function CaptivePortal() {
       .eq("id", businessId)
       .maybeSingle()
       .then(({ data }) => {
-        if (data) setBiz({ ...DEFAULTS, ...data });
+        if (data) setBiz({ ...DEFAULTS, ...data, primary_color: data.primary_color || DEFAULTS.primary_color });
         setLoading(false);
       });
   }, [businessId]);
@@ -58,17 +59,20 @@ export default function CaptivePortal() {
   async function save() {
     if (!businessId) return;
     setSaving(true);
-    const { error } = await supabase.from("businesses").update(biz).eq("id", businessId);
+    const { error } = await supabase.from("businesses").update({
+      welcome_message: biz.welcome_message,
+      terms_and_conditions: biz.terms_and_conditions,
+      redirect_url_after_purchase: biz.redirect_url_after_purchase,
+      captive_portal_template: biz.captive_portal_template,
+      captive_portal_language: biz.captive_portal_language,
+    }).eq("id", businessId);
     setSaving(false);
     if (error) return toast.error(error.message);
     toast.success("Captive portal saved");
   }
 
   async function pushToRouters() {
-    setPushing(true);
-    await new Promise((r) => setTimeout(r, 1100));
-    setPushing(false);
-    toast.success("Portal pushed to all routers", { description: "MikroTik file sync queued — check Routers for status." });
+    toast.message("Not available yet", { description: "Installing this page on your routers comes with the next router update. Your settings are saved and will be used then." });
   }
 
   if (loading) {
@@ -120,7 +124,7 @@ export default function CaptivePortal() {
                   <Input
                     value={biz.welcome_message ?? ""}
                     onChange={(e) => setBiz({ ...biz, welcome_message: e.target.value })}
-                    placeholder="Welcome to PalmConnect"
+                    placeholder="Welcome to Palm Connect"
                   />
                 </div>
                 <div className="space-y-1.5">
@@ -138,19 +142,8 @@ export default function CaptivePortal() {
                   </Select>
                 </div>
                 <div className="space-y-1.5">
-                  <Label>Brand color</Label>
-                  <div className="flex gap-2">
-                    <Input
-                      type="color"
-                      className="w-16 h-10 p-1"
-                      value={biz.primary_color}
-                      onChange={(e) => setBiz({ ...biz, primary_color: e.target.value })}
-                    />
-                    <Input
-                      value={biz.primary_color}
-                      onChange={(e) => setBiz({ ...biz, primary_color: e.target.value })}
-                    />
-                  </div>
+                  <Label>Logo and colors</Label>
+                  <p className="text-sm text-muted-foreground">Set on the <Link to="/dashboard/branding" className="font-medium underline underline-offset-2">Branding page</Link>.</p>
                 </div>
                 <div className="space-y-1.5">
                   <Label>Redirect URL after login</Label>

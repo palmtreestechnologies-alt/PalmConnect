@@ -81,7 +81,7 @@ export default function Register() {
             <li>✓ MikroTik RouterOS v7 ready</li>
           </ul>
         </div>
-        <p className="text-background/50 text-xs">© PalmConnect</p>
+        <p className="text-background/50 text-xs">© Palm Connect</p>
       </div>
       <div className="flex items-center justify-center p-6">
         <Card className="w-full max-w-md p-8 bg-card-grad shadow-card">

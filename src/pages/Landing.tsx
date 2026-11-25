@@ -221,7 +221,7 @@ export default function Landing() {
       <footer className="border-t border-border py-8 px-4 sm:px-6">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <Logo />
-          <p className="text-xs text-muted-foreground">© {new Date().getFullYear()} PalmConnect. Built for African hospitality.</p>
+          <p className="text-xs text-muted-foreground">© {new Date().getFullYear()} Palm Connect. Built for African hospitality.</p>
         </div>
       </footer>
     </div>

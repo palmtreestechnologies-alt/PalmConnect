@@ -185,6 +185,7 @@ export type Database = {
           organization_id: string | null
           phone: string | null
           primary_color: string | null
+          accent_color: string | null
           prune_inactive_after_days: number | null
           redirect_url_after_purchase: string | null
           stripe_enabled: boolean
@@ -209,6 +210,7 @@ export type Database = {
           organization_id?: string | null
           phone?: string | null
           primary_color?: string | null
+          accent_color?: string | null
           prune_inactive_after_days?: number | null
           redirect_url_after_purchase?: string | null
           stripe_enabled?: boolean
@@ -233,6 +235,7 @@ export type Database = {
           organization_id?: string | null
           phone?: string | null
           primary_color?: string | null
+          accent_color?: string | null
           prune_inactive_after_days?: number | null
           redirect_url_after_purchase?: string | null
           stripe_enabled?: boolean

@@ -13,7 +13,7 @@ export function Placeholder({ title, desc }: { title: string; desc: string }) {
         <Card className="p-16 bg-card-grad text-center">
           <Construction className="h-12 w-12 mx-auto text-secondary mb-3"/>
           <h3 className="font-display font-semibold text-lg">Coming in the next iteration</h3>
-          <p className="text-sm text-muted-foreground max-w-md mx-auto mt-1">This module is part of the next phase of PalmConnect. Tell the team what you'd like to see here first.</p>
+          <p className="text-sm text-muted-foreground max-w-md mx-auto mt-1">This module is part of the next phase of Palm Connect. Tell the team what you'd like to see here first.</p>
         </Card>
       </div>
     </DashboardLayout>

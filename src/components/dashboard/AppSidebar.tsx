@@ -7,6 +7,7 @@ import {
 import { ChevronDown, Router as RouterIcon, Shield } from "lucide-react";
 import { Logo } from "@/components/Logo";
 import { useAuth } from "@/hooks/useAuth";
+import { useBrand } from "@/components/brand/BrandingProvider";
 import { cn } from "@/lib/utils";
 import { primaryNav, adminNav, NavItem } from "@/app/navigation";
 
@@ -14,6 +15,7 @@ export function AppSidebar() {
   const { state } = useSidebar();
   const collapsed = state === "collapsed";
   const { hasRole } = useAuth();
+  const brand = useBrand();
   const location = useLocation();
   const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({});
 
@@ -80,9 +82,18 @@ export function AppSidebar() {
     <Sidebar collapsible="icon" className="border-r border-sidebar-border">
       <SidebarContent className="bg-sidebar">
         <div className="px-4 py-5 border-b border-sidebar-border">
-          {!collapsed ? <Logo variant="light" to="/dashboard" /> : (
+          {!collapsed ? (
+            brand.logoUrl ? (
+              <RRNavLink to="/dashboard" className="flex items-center gap-2.5 min-w-0">
+                <img src={brand.logoUrl} alt="" className="h-9 w-9 shrink-0 rounded-md object-contain bg-white/90 p-0.5" />
+                <span className="truncate font-display text-base font-semibold text-sidebar-foreground">{brand.name}</span>
+              </RRNavLink>
+            ) : <Logo variant="light" to="/dashboard" />
+          ) : (
             <div className="flex justify-center">
-              <div className="bg-emerald-grad p-2 rounded-lg"><RouterIcon className="h-4 w-4 text-background" /></div>
+              {brand.logoUrl
+                ? <img src={brand.logoUrl} alt="" className="h-8 w-8 rounded-md object-contain bg-white/90 p-0.5" />
+                : <div className="bg-emerald-grad p-2 rounded-lg"><RouterIcon className="h-4 w-4 text-background" /></div>}
             </div>
           )}
         </div>

@@ -17,9 +17,12 @@ import { RegisterGuestDialog } from "@/components/guests/RegisterGuestDialog";
 import { randomCode as rand, sendGuestSms } from "@/lib/guestLogin";
 import QRCode from "qrcode";
 import jsPDF from "jspdf";
+import { useBrand } from "@/components/brand/BrandingProvider";
+import { hexToRgb, readableOn } from "@/lib/branding";
 
 export default function Vouchers() {
   const { businessId, user } = useAuth();
+  const brand = useBrand();
   const [vouchers, setVouchers] = useState<any[]>([]);
   const [packages, setPackages] = useState<any[]>([]);
   const [open, setOpen] = useState(false);
@@ -58,17 +61,36 @@ export default function Vouchers() {
     const list = filtered.slice(0, 60);
     if (list.length === 0) { toast.error("No vouchers"); return; }
     const doc = new jsPDF({ unit: "mm", format: "a4" });
+    const col = brand.primary ?? "#0B3B2B";
+    const [pr, pg, pb] = hexToRgb(col);
+    const onCol = readableOn(col) === "dark" ? [255, 255, 255] : [20, 20, 20];
+    let logo: { data: string; w: number; h: number } | null = null;
+    if (brand.logoUrl) {
+      try {
+        const blob = await (await fetch(brand.logoUrl)).blob();
+        const data = await new Promise<string>((res, rej) => { const r = new FileReader(); r.onload = () => res(String(r.result)); r.onerror = rej; r.readAsDataURL(blob); });
+        const dim = await new Promise<{ w: number; h: number }>((res, rej) => { const im = new Image(); im.onload = () => res({ w: im.naturalWidth, h: im.naturalHeight }); im.onerror = rej; im.src = data; });
+        logo = { data, ...dim };
+      } catch { /* print without the logo */ }
+    }
+    const title = brand.name ? `${brand.name} WiFi` : "WiFi";
     const cardW = 90, cardH = 50, marginX = 15, marginY = 15, gap = 5;
     let x = marginX, y = marginY;
     for (let i = 0; i < list.length; i++) {
       const v = list[i];
       const loginUrl = `wifi:${v.username}:${v.password}`;
       const qr = await QRCode.toDataURL(loginUrl, { margin: 0, width: 200 });
-      doc.setDrawColor(15, 81, 50); doc.setLineWidth(0.4);
+      doc.setDrawColor(pr, pg, pb); doc.setLineWidth(0.4);
       doc.roundedRect(x, y, cardW, cardH, 3, 3);
-      doc.setFillColor(15, 81, 50); doc.rect(x, y, cardW, 8, "F");
-      doc.setTextColor(255, 255, 255); doc.setFontSize(10); doc.setFont("helvetica", "bold");
-      doc.text("PalmConnect WiFi", x + 3, y + 5.5);
+      doc.setFillColor(pr, pg, pb); doc.rect(x, y, cardW, 8, "F");
+      let tx = x + 3;
+      if (logo) {
+        const h = 6, w = Math.min(20, (logo.w / logo.h) * h);
+        const fmt = logo.data.startsWith("data:image/png") ? "PNG" : logo.data.startsWith("data:image/webp") ? "WEBP" : "JPEG";
+        try { doc.addImage(logo.data, fmt, x + 2, y + 1, w, h); tx = x + w + 4; } catch { /* skip */ }
+      }
+      doc.setTextColor(onCol[0], onCol[1], onCol[2]); doc.setFontSize(10); doc.setFont("helvetica", "bold");
+      doc.text(doc.splitTextToSize(title, cardW - (tx - x) - 2)[0], tx, y + 5.5);
       doc.setTextColor(20, 20, 20);
       doc.addImage(qr, "PNG", x + cardW - 32, y + 12, 28, 28);
       doc.setFontSize(8); doc.setFont("helvetica", "normal");

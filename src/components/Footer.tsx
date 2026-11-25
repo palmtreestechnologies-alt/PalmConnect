@@ -20,7 +20,7 @@ export function Footer() {
             Legal
           </Link>
         </div>
-        <p>© {new Date().getFullYear()} PalmConnect. Smart Wi-Fi. Better Business.</p>
+        <p>© {new Date().getFullYear()} Palm Connect. Smart Wi-Fi. Better Business.</p>
       </div>
     </footer>
   );

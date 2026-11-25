@@ -47,13 +47,13 @@ export default function Login() {
           <h2 className="font-display text-4xl font-bold text-background leading-tight max-w-md">Manage every guest, every device, every voucher — from one dashboard.</h2>
           <p className="text-background/70 mt-4 max-w-md">Built for MikroTik. Trusted by restaurants, hotels and villas.</p>
         </div>
-        <p className="text-background/50 text-xs">© PalmConnect</p>
+        <p className="text-background/50 text-xs">© Palm Connect</p>
       </div>
       <div className="flex items-center justify-center p-6">
         <Card className="w-full max-w-md p-8 bg-card-grad shadow-card">
           <div className="lg:hidden mb-6"><Logo /></div>
           <h1 className="font-display text-2xl font-bold text-foreground">Sign in</h1>
-          <p className="text-sm text-muted-foreground mt-1">Welcome back to PalmConnect.</p>
+          <p className="text-sm text-muted-foreground mt-1">Welcome back to Palm Connect.</p>
           <form onSubmit={onSubmit} className="mt-6 space-y-4">
             <div className="space-y-1.5">
               <Label htmlFor="email">Email</Label>

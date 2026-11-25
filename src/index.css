@@ -6,63 +6,61 @@
 
 @layer base {
   :root {
-    /* PalmConnect brand — deep navy + emerald/lime gradient */
-    --background: 0 0% 100%;
-    --foreground: 210 55% 10%;
+    /* Palm Connect brand: deep palm green + warm gold */
+    --background: 48 33% 98%;
+    --foreground: 160 40% 8%;
 
     --card: 0 0% 100%;
-    --card-foreground: 210 55% 10%;
+    --card-foreground: 160 40% 8%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 210 55% 10%;
+    --popover-foreground: 160 40% 8%;
 
-    /* Deep navy (from wordmark) */
-    --primary: 210 55% 12%;
-    --primary-foreground: 0 0% 100%;
-    --primary-glow: 158 75% 42%;
+    --primary: 160 63% 15%;
+    --primary-foreground: 48 33% 98%;
+    --primary-glow: 156 50% 30%;
 
-    /* Vibrant emerald/lime (from logo accent) */
-    --secondary: 152 70% 45%;
-    --secondary-foreground: 210 55% 10%;
+    --secondary: 42 80% 55%;
+    --secondary-foreground: 160 40% 8%;
 
-    --muted: 200 20% 95%;
-    --muted-foreground: 210 20% 40%;
+    --muted: 48 18% 94%;
+    --muted-foreground: 160 14% 36%;
 
-    --accent: 152 70% 45%;
-    --accent-foreground: 210 55% 10%;
+    --accent: 42 80% 55%;
+    --accent-foreground: 160 40% 8%;
 
     --destructive: 0 70% 45%;
     --destructive-foreground: 0 0% 100%;
 
-    --success: 142 60% 35%;
+    --success: 150 55% 30%;
     --warning: 35 85% 50%;
 
-    --border: 200 20% 88%;
-    --input: 200 20% 88%;
-    --ring: 152 70% 45%;
+    --border: 48 14% 87%;
+    --input: 48 14% 87%;
+    --ring: 42 80% 50%;
 
     --radius: 0.85rem;
 
-    /* Gradients — navy → emerald → lime, mirroring the logo */
-    --gradient-hero: linear-gradient(135deg, hsl(210 60% 8%) 0%, hsl(195 55% 14%) 50%, hsl(158 65% 22%) 100%);
-    --gradient-emerald: linear-gradient(135deg, hsl(210 55% 12%) 0%, hsl(158 70% 30%) 60%, hsl(140 75% 50%) 100%);
-    --gradient-gold: linear-gradient(135deg, hsl(152 70% 45%), hsl(140 80% 55%));
-    --gradient-card: linear-gradient(160deg, hsl(0 0% 100%) 0%, hsl(200 30% 98%) 100%);
+    /* Gradients: deep green for surfaces, gold for the main action */
+    --gradient-hero: linear-gradient(135deg, hsl(160 55% 7%) 0%, hsl(160 55% 12%) 55%, hsl(156 45% 20%) 100%);
+    --gradient-emerald: linear-gradient(135deg, hsl(160 63% 12%) 0%, hsl(156 50% 24%) 100%);
+    --gradient-gold: linear-gradient(135deg, hsl(42 85% 52%), hsl(46 90% 64%));
+    --gradient-card: linear-gradient(160deg, hsl(0 0% 100%) 0%, hsl(48 25% 98%) 100%);
 
     /* Shadows */
-    --shadow-elegant: 0 20px 60px -20px hsl(210 55% 12% / 0.28);
-    --shadow-gold: 0 10px 40px -10px hsl(152 70% 45% / 0.45);
-    --shadow-card: 0 4px 20px -4px hsl(210 55% 10% / 0.08);
+    --shadow-elegant: 0 20px 60px -20px hsl(160 63% 12% / 0.30);
+    --shadow-gold: 0 10px 40px -10px hsl(42 85% 50% / 0.45);
+    --shadow-card: 0 4px 20px -4px hsl(160 40% 8% / 0.08);
 
-    /* Sidebar — deep navy with lime accents */
-    --sidebar-background: 210 60% 9%;
-    --sidebar-foreground: 200 20% 92%;
-    --sidebar-primary: 152 70% 50%;
-    --sidebar-primary-foreground: 210 55% 10%;
-    --sidebar-accent: 210 45% 15%;
-    --sidebar-accent-foreground: 200 20% 95%;
-    --sidebar-border: 210 35% 18%;
-    --sidebar-ring: 152 70% 50%;
+    /* Sidebar: deep green with gold accents */
+    --sidebar-background: 160 55% 7%;
+    --sidebar-foreground: 48 20% 92%;
+    --sidebar-primary: 42 80% 55%;
+    --sidebar-primary-foreground: 160 40% 8%;
+    --sidebar-accent: 160 40% 13%;
+    --sidebar-accent-foreground: 48 20% 95%;
+    --sidebar-border: 160 30% 16%;
+    --sidebar-ring: 42 80% 55%;
 
     --transition-smooth: cubic-bezier(0.4, 0, 0.2, 1);
   }
@@ -87,8 +85,8 @@
     --destructive-foreground: 0 0% 100%;
     --border: 158 30% 18%;
     --input: 158 30% 18%;
-    --ring: 158 70% 45%;
     --gradient-card: linear-gradient(160deg, hsl(160 40% 10%) 0%, hsl(158 35% 12%) 100%);
+    --ring: 42 80% 55%;
   }
 }
 

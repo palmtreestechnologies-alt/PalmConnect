@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
-import logo from "@/assets/palmconnect-logo.png";
+import { PalmMark } from "@/components/brand/PalmMark";
 
 export function Logo({
   className,
@@ -16,11 +16,7 @@ export function Logo({
   const text = variant === "light" ? "text-background" : "text-foreground";
   return (
     <Link to={to} className={cn("flex items-center gap-2.5 group", className)}>
-      <img
-        src={logo}
-        alt="PalmConnect — Smart Wi-Fi. Better Business."
-        className="h-10 w-10 object-contain shrink-0"
-      />
+      <PalmMark className="h-10 w-10" />
       {showWordmark && (
         <div className="flex flex-col leading-none">
           <span className={cn("font-display font-bold text-lg tracking-tight", text)}>

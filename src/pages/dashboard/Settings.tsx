@@ -17,6 +17,7 @@ import { Settings as SettingsIcon, Wifi, Upload, Loader2, CreditCard } from "luc
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
+import { Link } from "react-router-dom";
 
 type BusinessSettings = {
   name: string;
@@ -90,7 +91,6 @@ export default function Settings() {
         name: form.name,
         email: form.email,
         phone: form.phone,
-        primary_color: form.primary_color,
         welcome_message: form.welcome_message,
         support_phone: form.support_phone,
         support_email: form.support_email,
@@ -106,31 +106,6 @@ export default function Settings() {
     setSaving(false);
     if (error) toast.error(error.message);
     else toast.success("Settings saved");
-  }
-
-  async function onLogo(file: File) {
-    if (!businessId) return;
-    if (file.size > 2 * 1024 * 1024) return toast.error("Logo must be under 2 MB");
-    setUploading(true);
-    const path = `${businessId}/logo-${Date.now()}-${file.name.replace(/[^a-z0-9.]/gi, "_")}`;
-    const { error: upErr } = await supabase.storage
-      .from("business-logos")
-      .upload(path, file, { upsert: true });
-    if (upErr) {
-      setUploading(false);
-      return toast.error(upErr.message);
-    }
-    const { data } = supabase.storage.from("business-logos").getPublicUrl(path);
-    const { error } = await supabase
-      .from("businesses")
-      .update({ logo_url: data.publicUrl })
-      .eq("id", businessId);
-    setUploading(false);
-    if (error) toast.error(error.message);
-    else {
-      update("logo_url", data.publicUrl);
-      toast.success("Logo updated");
-    }
   }
 
   if (loading) {
@@ -182,61 +157,14 @@ export default function Settings() {
                 </p>
               </div>
 
-              <div className="space-y-2">
-                <Label>Business logo</Label>
-                <div className="flex items-center gap-4">
-                  <div className="h-20 w-20 rounded-lg border border-border bg-muted grid place-items-center overflow-hidden">
-                    {form.logo_url ? (
-                      <img
-                        src={form.logo_url}
-                        alt="Business logo"
-                        className="h-full w-full object-contain"
-                      />
-                    ) : (
-                      <Upload className="h-5 w-5 text-muted-foreground" />
-                    )}
-                  </div>
-                  <label className="cursor-pointer">
-                    <input
-                      type="file"
-                      accept="image/png,image/jpeg,image/webp,image/svg+xml"
-                      className="hidden"
-                      disabled={uploading}
-                      onChange={(e) => e.target.files?.[0] && onLogo(e.target.files[0])}
-                    />
-                    <span className="inline-flex items-center gap-2 px-3 py-2 rounded-md border border-border bg-background text-sm hover:bg-muted transition-colors">
-                      {uploading ? (
-                        <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                      ) : (
-                        <Upload className="h-3.5 w-3.5" />
-                      )}
-                      {form.logo_url ? "Replace logo" : "Upload logo"}
-                    </span>
-                  </label>
-                </div>
-                <p className="text-xs text-muted-foreground">PNG, JPG, WebP or SVG. Max 2 MB.</p>
-              </div>
+              <p className="text-sm">
+                Logo and colors now live on the <Link to="/dashboard/branding" className="font-medium underline underline-offset-2">Branding page</Link>.
+              </p>
 
               <div className="grid sm:grid-cols-2 gap-4">
                 <div className="space-y-1.5">
                   <Label>Business name</Label>
                   <Input value={form.name} onChange={(e) => update("name", e.target.value)} />
-                </div>
-                <div className="space-y-1.5">
-                  <Label>Brand color</Label>
-                  <div className="flex gap-2">
-                    <Input
-                      type="color"
-                      value={form.primary_color || "#0F5132"}
-                      onChange={(e) => update("primary_color", e.target.value)}
-                      className="w-16 p-1 h-10"
-                    />
-                    <Input
-                      value={form.primary_color || ""}
-                      onChange={(e) => update("primary_color", e.target.value)}
-                      placeholder="#0F5132"
-                    />
-                  </div>
                 </div>
               </div>
             </Card>

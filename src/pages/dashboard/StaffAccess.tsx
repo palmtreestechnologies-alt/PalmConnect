@@ -216,7 +216,7 @@ export default function StaffAccess() {
     doc.text("Staff WiFi Access", 50, 10, { align: "center" });
     doc.setFont("helvetica", "normal");
     doc.setFontSize(8);
-    doc.text("PalmConnect", 50, 16, { align: "center" });
+    doc.text("Palm Connect", 50, 16, { align: "center" });
 
     // Body
     doc.setTextColor(20, 20, 20);

@@ -9,6 +9,8 @@ import Routers from "@/pages/dashboard/Routers";
 import Packages from "@/pages/dashboard/Packages";
 import Vouchers from "@/pages/dashboard/Vouchers";
 import StaffAccess from "@/pages/dashboard/StaffAccess";
+import { BrandingProvider } from "@/components/brand/BrandingProvider";
+import Branding from "@/pages/dashboard/Branding";
 import Settings from "@/pages/dashboard/Settings";
 import CaptivePortal from "@/pages/dashboard/CaptivePortal";
 import HotspotUsers from "@/pages/dashboard/HotspotUsers";
@@ -25,6 +27,7 @@ import { Marketplace, PalmAI, Notifications, Downloads, HelpCenter } from "@/pag
 export function AppRouter() {
   return (
     <BrowserRouter>
+      <BrandingProvider>
       <Routes>
         <Route path="/" element={<Landing />} />
         <Route path="/login" element={<Login />} />
@@ -43,6 +46,7 @@ export function AppRouter() {
         <Route path="/buy/:businessId" element={<WifiSelfCare />} />
         <Route path="/dashboard/analytics" element={<ProtectedRoute><Analytics /></ProtectedRoute>} />
         <Route path="/dashboard/network-check" element={<ProtectedRoute><NetworkValidator /></ProtectedRoute>} />
+        <Route path="/dashboard/branding" element={<ProtectedRoute><Branding /></ProtectedRoute>} />
         <Route path="/dashboard/portal" element={<ProtectedRoute><CaptivePortal /></ProtectedRoute>} />
         <Route path="/dashboard/logs" element={<ProtectedRoute><Logs /></ProtectedRoute>} />
         <Route path="/dashboard/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
@@ -55,6 +59,7 @@ export function AppRouter() {
         <Route path="/admin" element={<ProtectedRoute role="super_admin"><SuperAdmin /></ProtectedRoute>} />
         <Route path="*" element={<NotFound />} />
       </Routes>
+      </BrandingProvider>
     </BrowserRouter>
   );
 }

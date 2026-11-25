@@ -1,7 +1,7 @@
 import {
   LayoutDashboard, Building2, Users, Network, BarChart3, CreditCard,
   Store, Sparkles, Bell, Download, Settings, LifeBuoy, Shield,
-  Router, Ticket, Package, UserCog, Activity, Palette, ScrollText,
+  Router, Ticket, Package, UserCog, Activity, Palette, Brush, ScrollText,
 } from "lucide-react";
 import type { ComponentType } from "react";
 
@@ -37,6 +37,7 @@ export const primaryNav: NavItem[] = [
     title: "Networking", url: "/dashboard/routers", icon: Network,
     children: [
       { title: "Routers", url: "/dashboard/routers", icon: Router },
+      { title: "Branding", url: "/dashboard/branding", icon: Brush },
       { title: "Captive Portal", url: "/dashboard/portal", icon: Palette },
       { title: "Network Check", url: "/dashboard/network-check", icon: Network },
     ],
