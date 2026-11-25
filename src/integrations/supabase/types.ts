@@ -1235,6 +1235,7 @@ export type Database = {
         Row: {
           device_limit: number | null
           guest_name: string | null
+          guest_phone: string | null
           room: string | null
           batch_id: string | null
           business_id: string
@@ -1253,6 +1254,7 @@ export type Database = {
         Insert: {
           device_limit?: number | null
           guest_name?: string | null
+          guest_phone?: string | null
           room?: string | null
           batch_id?: string | null
           business_id: string
@@ -1271,6 +1273,7 @@ export type Database = {
         Update: {
           device_limit?: number | null
           guest_name?: string | null
+          guest_phone?: string | null
           room?: string | null
           batch_id?: string | null
           business_id?: string

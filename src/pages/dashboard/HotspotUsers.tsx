@@ -15,6 +15,8 @@ import { Plus, Search, Users, MoreHorizontal, RefreshCw, Trash2, Loader2 } from 
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
+import { RegisterGuestDialog } from "@/components/guests/RegisterGuestDialog";
+import { useNavigate } from "react-router-dom";
 import { z } from "zod";
 
 const userSchema = z.object({
@@ -68,6 +70,8 @@ export default function HotspotUsers() {
   const [saving, setSaving] = useState(false);
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [syncing, setSyncing] = useState<string | null>(null);
+  const [guestOpen, setGuestOpen] = useState(false);
+  const navigate = useNavigate();
 
   async function load() {
     if (!businessId) return;
@@ -181,9 +185,14 @@ export default function HotspotUsers() {
             <h1 className="font-display text-2xl md:text-3xl font-bold">Hotspot Users</h1>
             <p className="text-sm text-muted-foreground">Persistent accounts synced to your routers.</p>
           </div>
-          <Button variant="hero" onClick={openNew}>
-            <Plus className="h-4 w-4" /> New user
-          </Button>
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={openNew}>
+              <Plus className="h-4 w-4" /> Advanced user
+            </Button>
+            <Button variant="hero" onClick={() => setGuestOpen(true)}>
+              <Plus className="h-4 w-4" /> Register guest
+            </Button>
+          </div>
         </div>
 
         <div className="flex items-center gap-3 flex-wrap">
@@ -295,10 +304,16 @@ export default function HotspotUsers() {
           </Card>
         )}
 
+        <RegisterGuestDialog
+          open={guestOpen}
+          onOpenChange={setGuestOpen}
+          onDone={() => toast.success("Guest registered. Find the login on the Vouchers page.", { action: { label: "Open", onClick: () => navigate("/dashboard/vouchers") } })}
+        />
+
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>{editing.id ? "Edit hotspot user" : "New hotspot user"}</DialogTitle>
+              <DialogTitle>{editing.id ? "Edit hotspot user" : "New advanced hotspot user"}</DialogTitle>
             </DialogHeader>
             <div className="space-y-3">
               <div className="grid grid-cols-2 gap-3">

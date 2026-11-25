@@ -12,21 +12,10 @@ import { Plus, Ticket as TicketIcon, Download, Search } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
+import { RegisterGuestDialog } from "@/components/guests/RegisterGuestDialog";
+import { randomCode as rand } from "@/lib/guestLogin";
 import QRCode from "qrcode";
 import jsPDF from "jspdf";
-
-const ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-// Cryptographically random, unbiased picks (never Math.random for credentials).
-function rand(n: number, alphabet = ALPHABET) {
-  const limit = 256 - (256 % alphabet.length);
-  let out = "";
-  while (out.length < n) {
-    const buf = new Uint8Array(n * 2);
-    crypto.getRandomValues(buf);
-    for (const b of buf) { if (b < limit && out.length < n) out += alphabet[b % alphabet.length]; }
-  }
-  return out;
-}
 
 export default function Vouchers() {
   const { businessId, user } = useAuth();
@@ -36,8 +25,6 @@ export default function Vouchers() {
   const [q, setQ] = useState("");
   const [bulk, setBulk] = useState({ count: "10", package_id: "", prefix: "PT" });
   const [guestOpen, setGuestOpen] = useState(false);
-  const [guest, setGuest] = useState({ name: "", room: "", package_id: "", devices: "1" });
-  const [issued, setIssued] = useState<{ username: string; password: string; name: string; devices: number; expires: string } | null>(null);
 
   async function load() {
     if (!businessId) return;
@@ -64,31 +51,6 @@ export default function Vouchers() {
     const { error } = await supabase.from("vouchers").insert(rows);
     if (error) { toast.error(error.message); return; }
     toast.success(`${count} vouchers generated`); setOpen(false); load();
-  }
-
-  // Front desk: one unique login per guest, with the number of devices the guest asked for.
-  async function issueGuest(e: React.FormEvent) {
-    e.preventDefault();
-    const pkg = packages.find((x) => x.id === guest.package_id);
-    if (!pkg) { toast.error("Pick a package first"); return; }
-    if (!guest.name.trim()) { toast.error("Enter the guest's name"); return; }
-    const devices = Math.min(Math.max(parseInt(guest.devices) || 1, 1), 10);
-    const expires = new Date(Date.now() + pkg.duration_minutes * 60000).toISOString();
-    for (let attempt = 0; attempt < 4; attempt++) {
-      const row = {
-        business_id: businessId, package_id: pkg.id, created_by: user?.id,
-        username: (bulk.prefix || "PT") + rand(6), password: rand(8), expires_at: expires, status: "unused",
-        guest_name: guest.name.trim(), room: guest.room.trim() || null, device_limit: devices,
-      };
-      const { error } = await supabase.from("vouchers").insert(row);
-      if (!error) {
-        setIssued({ username: row.username, password: row.password, name: row.guest_name, devices, expires });
-        setGuest({ name: "", room: "", package_id: guest.package_id, devices: "1" });
-        load(); return;
-      }
-      if (!error.message.includes("duplicate")) { toast.error(error.message); return; }
-    }
-    toast.error("Could not create a unique login. Try again.");
   }
 
   async function exportPDF() {
@@ -136,45 +98,12 @@ export default function Vouchers() {
         <div className="flex items-center justify-between flex-wrap gap-3">
           <div>
             <h1 className="font-display text-2xl md:text-3xl font-bold">Vouchers</h1>
-            <p className="text-sm text-muted-foreground">Issue a unique login to each guest, with the number of devices they asked for.</p>
+            <p className="text-sm text-muted-foreground">Register a guest with their phone, devices and stay. The login is created for you.</p>
           </div>
           <div className="flex gap-2">
             <Button variant="outline" onClick={exportPDF} disabled={filtered.length===0}><Download className="h-4 w-4"/>Export PDF</Button>
-            <Dialog open={guestOpen} onOpenChange={(o)=>{ setGuestOpen(o); if (!o) setIssued(null); }}>
-              <DialogTrigger asChild><Button variant="hero"><Plus className="h-4 w-4"/>Issue guest login</Button></DialogTrigger>
-              <DialogContent>
-                <DialogHeader><DialogTitle>{issued ? "Give these details to the guest" : "Issue guest login"}</DialogTitle></DialogHeader>
-                {issued ? (
-                  <div className="space-y-3">
-                    <div className="rounded-lg border p-4 space-y-2">
-                      <p className="text-sm text-muted-foreground">{issued.name}</p>
-                      <p>Username <span className="font-mono font-bold text-lg">{issued.username}</span></p>
-                      <p>Password <span className="font-mono font-bold text-lg">{issued.password}</span></p>
-                      <p className="text-sm text-muted-foreground">Up to {issued.devices} device{issued.devices>1?"s":""} · valid until {new Date(issued.expires).toLocaleString()}</p>
-                    </div>
-                    <p className="text-xs text-muted-foreground">This login works only for this guest. Do not reuse it.</p>
-                    <Button className="w-full" variant="hero" onClick={()=>setIssued(null)}>Issue another</Button>
-                  </div>
-                ) : (
-                  <form onSubmit={issueGuest} className="space-y-3">
-                    <div className="space-y-1.5"><Label htmlFor="g-name">Guest name</Label><Input id="g-name" value={guest.name} onChange={(e)=>setGuest({...guest,name:e.target.value})} maxLength={80} required/></div>
-                    <div className="grid grid-cols-2 gap-3">
-                      <div className="space-y-1.5"><Label htmlFor="g-room">Room or table</Label><Input id="g-room" value={guest.room} onChange={(e)=>setGuest({...guest,room:e.target.value})} maxLength={20}/></div>
-                      <div className="space-y-1.5"><Label htmlFor="g-dev">Devices</Label><Input id="g-dev" type="number" min={1} max={10} value={guest.devices} onChange={(e)=>setGuest({...guest,devices:e.target.value})}/></div>
-                    </div>
-                    <div className="space-y-1.5">
-                      <Label>Package</Label>
-                      <Select value={guest.package_id} onValueChange={(v)=>setGuest({...guest, package_id: v})}>
-                        <SelectTrigger><SelectValue placeholder="Choose package"/></SelectTrigger>
-                        <SelectContent>{packages.map((p) => <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>)}</SelectContent>
-                      </Select>
-                      {packages.length===0 && <p className="text-xs text-warning">Create a package first.</p>}
-                    </div>
-                    <Button type="submit" className="w-full" variant="hero" disabled={packages.length===0}>Create login</Button>
-                  </form>
-                )}
-              </DialogContent>
-            </Dialog>
+            <Button variant="hero" onClick={()=>setGuestOpen(true)}><Plus className="h-4 w-4"/>Register guest</Button>
+            <RegisterGuestDialog open={guestOpen} onOpenChange={setGuestOpen} onDone={load}/>
             <Dialog open={open} onOpenChange={setOpen}>
               <DialogTrigger asChild><Button variant="outline"><Plus className="h-4 w-4"/>Bulk generate</Button></DialogTrigger>
               <DialogContent>
@@ -213,11 +142,11 @@ export default function Vouchers() {
         ) : (
           <Card className="bg-card-grad overflow-hidden">
             <Table>
-              <TableHeader><TableRow><TableHead>Guest</TableHead><TableHead>Username</TableHead><TableHead>Password</TableHead><TableHead>Devices</TableHead><TableHead>Package</TableHead><TableHead>Status</TableHead><TableHead>Expires</TableHead><TableHead>Created</TableHead></TableRow></TableHeader>
+              <TableHeader><TableRow><TableHead>Guest phone</TableHead><TableHead>Username</TableHead><TableHead>Password</TableHead><TableHead>Devices</TableHead><TableHead>Package</TableHead><TableHead>Status</TableHead><TableHead>Expires</TableHead><TableHead>Created</TableHead></TableRow></TableHeader>
               <TableBody>
                 {filtered.map((v) => (
                   <TableRow key={v.id}>
-                    <TableCell>{v.guest_name ? <>{v.guest_name}{v.room ? <span className="text-muted-foreground"> · {v.room}</span> : null}</> : "—"}</TableCell>
+                    <TableCell>{v.guest_phone ? `+${v.guest_phone}` : v.guest_name ? <>{v.guest_name}{v.room ? <span className="text-muted-foreground"> · {v.room}</span> : null}</> : "—"}</TableCell>
                     <TableCell className="font-mono font-semibold">{v.username}</TableCell>
                     <TableCell className="font-mono">{v.password}</TableCell>
                     <TableCell>{v.device_limit ?? v.packages?.device_limit ?? 1}</TableCell>
