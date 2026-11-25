@@ -1231,6 +1231,18 @@ export type Database = {
           },
         ]
       }
+      sms_balance: {
+        Row: { business_id: string; credits: number; updated_at: string }
+        Insert: { business_id: string; credits?: number; updated_at?: string }
+        Update: { business_id?: string; credits?: number; updated_at?: string }
+        Relationships: []
+      }
+      sms_packs: {
+        Row: { id: string; code: string; name: string; credits: number; price_cents: number; active: boolean; sort_order: number }
+        Insert: { id?: string; code: string; name: string; credits: number; price_cents: number; active?: boolean; sort_order?: number }
+        Update: { id?: string; code?: string; name?: string; credits?: number; price_cents?: number; active?: boolean; sort_order?: number }
+        Relationships: []
+      }
       vouchers: {
         Row: {
           device_limit: number | null

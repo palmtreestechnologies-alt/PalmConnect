@@ -12,6 +12,7 @@ import { Plus, Ticket as TicketIcon, Download, Search, MessageSquareText } from 
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
+import { SmsCredits } from "@/components/guests/SmsCredits";
 import { RegisterGuestDialog } from "@/components/guests/RegisterGuestDialog";
 import { randomCode as rand, sendGuestSms } from "@/lib/guestLogin";
 import QRCode from "qrcode";
@@ -101,6 +102,7 @@ export default function Vouchers() {
             <p className="text-sm text-muted-foreground">Register a guest with their phone, devices and stay. The login is created for you.</p>
           </div>
           <div className="flex gap-2">
+            <SmsCredits/>
             <Button variant="outline" onClick={exportPDF} disabled={filtered.length===0}><Download className="h-4 w-4"/>Export PDF</Button>
             <Button variant="hero" onClick={()=>setGuestOpen(true)}><Plus className="h-4 w-4"/>Register guest</Button>
             <RegisterGuestDialog open={guestOpen} onOpenChange={setGuestOpen} onDone={load}/>

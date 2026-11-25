@@ -46,6 +46,9 @@ Deno.serve(async (req) => {
             if (won?.length && (pay.metadata as any)?.kind === "subscription") {
               await sr.rpc("activate_subscription_payment", { _payment_id: pay.id });
             }
+            if (won?.length && (pay.metadata as any)?.kind === "sms_pack") {
+              await sr.rpc("activate_sms_payment", { _payment_id: pay.id });
+            }
           } else if (q.resultCode && q.resultCode !== "0" && q.resultCode !== "4999") {
             await sr.from("payments").update({ status: q.resultCode === "1032" ? "cancelled" : "failed", failure_reason: q.resultDesc })
               .eq("id", pay.id).eq("status", "pending");

@@ -44,6 +44,7 @@ export const SPEED_OPTIONS = [
 ] as const;
 
 const SMS_ERRORS: Record<string, string> = {
+  no_credits: "You have no SMS credits left. Tap Buy SMS on the Vouchers page to top up.",
   sms_not_configured: "SMS is not switched on yet. Use Copy or WhatsApp for now.",
   no_phone: "This login has no phone number.",
   expired: "This login has already expired.",

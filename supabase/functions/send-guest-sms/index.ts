@@ -46,6 +46,10 @@ Deno.serve(async (req) => {
     if ((perVoucher ?? 0) >= MAX_PER_VOUCHER) return json({ error: "limit_voucher" }, 429);
     if ((perDay ?? 0) >= MAX_PER_BUSINESS_PER_DAY) return json({ error: "limit_daily" }, 429);
 
+    // One credit per SMS, taken before sending and returned if the provider fails.
+    const { data: reserved } = await sr.rpc("sms_reserve", { _business_id: v.business_id });
+    if (!reserved) return json({ error: "no_credits" }, 402);
+
     const until = v.expires_at
       ? new Intl.DateTimeFormat("en-GB", { timeZone: "Africa/Nairobi", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })
           .format(new Date(v.expires_at))
@@ -60,11 +64,17 @@ Deno.serve(async (req) => {
     const sender = Deno.env.get("AT_SENDER_ID");
     if (sender) form.set("from", sender);
     const base = atUser === "sandbox" ? "https://api.sandbox.africastalking.com" : "https://api.africastalking.com";
-    const res = await fetch(`${base}/version1/messaging`, {
-      method: "POST",
-      headers: { apiKey: atKey, Accept: "application/json", "Content-Type": "application/x-www-form-urlencoded" },
-      body: form,
-    });
+    let res: Response;
+    try {
+      res = await fetch(`${base}/version1/messaging`, {
+        method: "POST",
+        headers: { apiKey: atKey, Accept: "application/json", "Content-Type": "application/x-www-form-urlencoded" },
+        body: form,
+      });
+    } catch (e) {
+      await sr.rpc("sms_refund", { _business_id: v.business_id });
+      throw e;
+    }
     const out = await res.json().catch(() => ({}));
     const rec = out?.SMSMessageData?.Recipients?.[0];
     const ok = res.ok && rec && /^(Success|Sent)/i.test(String(rec.status));
@@ -72,6 +82,7 @@ Deno.serve(async (req) => {
       business_id: v.business_id, voucher_id: v.id, phone: v.guest_phone,
       status: ok ? "sent" : "failed", detail: String(rec?.status ?? res.status).slice(0, 200),
     });
+    if (!ok) await sr.rpc("sms_refund", { _business_id: v.business_id });
     if (!ok) return json({ error: "provider_failed", detail: String(rec?.status ?? res.status) }, 502);
     return json({ sent: true });
   } catch (e) {

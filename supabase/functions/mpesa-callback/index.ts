@@ -104,6 +104,9 @@ Deno.serve(async (req) => {
     if (updated?.length && (pay.metadata as any)?.kind === "subscription") {
       await sr.rpc("activate_subscription_payment", { _payment_id: pay.id });
     }
+    if (updated?.length && (pay.metadata as any)?.kind === "sms_pack") {
+      await sr.rpc("activate_sms_payment", { _payment_id: pay.id });
+    }
     return ack();
   } catch (err) {
     console.error("mpesa-callback error", (err as Error).message);
