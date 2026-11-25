@@ -34,7 +34,7 @@ function quotedMultiline(src: string, chunk = 250): string {
 const safeLabel = (s: string) => s.replace(/[^A-Za-z0-9 _-]/g, "").slice(0, 40);
 const POLICY = "ftp,read,write,policy,test";
 
-export interface SetupParams { baseUrl: string; routerId: string; agentKey: string; routerName: string; iface: string; cidr: string }
+export interface SetupParams { baseUrl: string; routerId: string; agentKey: string; routerName: string; iface: string; cidr: string; ssid?: string | null }
 
 export function buildSyncSource(p: { baseUrl: string; routerId: string; agentKey: string }): string {
   if (!/^https:\/\/[A-Za-z0-9.-]+(\/[A-Za-z0-9._\/-]*)?$/.test(p.baseUrl)) throw new Error("bad base url");
@@ -99,6 +99,7 @@ export function buildSetupScript(p: SetupParams): string {
   const bridge = p.iface === BRIDGE_IFACE;
   const c = cidrPlan(p.cidr);
   const name = safeLabel(p.routerName) || "router";
+  if (p.ssid != null && !/^[A-Za-z0-9 _-]{1,32}$/.test(p.ssid)) throw new Error("bad ssid");
   return [
     `# Palm Connect setup for ${name}`,
     ':log info "Palm Connect: setup started"',
@@ -110,6 +111,8 @@ export function buildSetupScript(p: SetupParams): string {
     '/system backup save name=palm-pre-setup',
     '/export file=palm-pre-setup',
     ...(bridge ? [`:if ([:len [/interface bridge find name=${BRIDGE_IFACE}]]=0) do={/interface bridge add name=${BRIDGE_IFACE} comment=palm-hotspot}`] : []),
+    // Make sure the guest login page files exist (a router reset without defaults has none).
+    ':do {/ip hotspot reset-html} on-error={}',
     '/ip hotspot remove [find name=palm-hotspot]',
     '/ip hotspot profile remove [find name=palm-profile]',
     '/ip dhcp-server remove [find name=palm-dhcp]',
@@ -131,6 +134,10 @@ export function buildSetupScript(p: SetupParams): string {
     `/system scheduler add name=palm-sync interval=1m start-time=startup on-event="/system script run palm-sync" policy=${POLICY}`,
     '/system script run palm-sync',
     // Ports join the bridge last: if the connection you pasted this over drops for a moment, setup is already done.
+    ...(bridge && p.ssid ? [
+      ':put "Palm Connect: turning on the Wi-Fi ..."',
+      `:do {/interface wireless set [find default-name=wlan1] mode=ap-bridge ssid="${p.ssid}" country=kenya band=2ghz-b/g/n frequency=auto disabled=no} on-error={:put "Palm Connect: could not turn on the Wi-Fi. You can set it in WinBox under Wireless."}`,
+    ] : []),
     ...(bridge ? [
       ':put "Palm Connect: adding ports to the guest network ..."',
       addPorts("ethernet", ' where name!="ether1"'),

@@ -935,6 +935,7 @@ export type Database = {
           connection_mode: string
           hotspot_interface: string | null
           hotspot_cidr: string | null
+          wifi_ssid: string | null
           model: string | null
           ros_version: string | null
           provisioned_at: string | null
@@ -955,6 +956,7 @@ export type Database = {
           connection_mode?: string
           hotspot_interface?: string | null
           hotspot_cidr?: string | null
+          wifi_ssid?: string | null
         }
         Update: {
           api_port?: number
@@ -971,6 +973,7 @@ export type Database = {
           connection_mode?: string
           hotspot_interface?: string | null
           hotspot_cidr?: string | null
+          wifi_ssid?: string | null
         }
         Relationships: [
           {

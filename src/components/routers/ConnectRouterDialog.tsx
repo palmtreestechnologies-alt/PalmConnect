@@ -36,6 +36,7 @@ export function ConnectRouterDialog({ open, onOpenChange, onCreated }: Props) {
   const timer = useRef<number>();
 
   const nameErr = name.trim().length < 2 ? "Enter a name, for example Reception." : "";
+  const ssidErr = allPorts && !/^[A-Za-z0-9 _-]{1,32}$/.test(ssid.trim()) ? "Enter the Wi-Fi name guests will see. Letters, numbers, spaces, - and _ only." : "";
   const iface = allPorts ? ALL_PORTS : single;
   const ifaceErr = IFACE.test(iface) ? "" : "Use the exact interface name from WinBox, for example ether5 or wlan1.";
 
@@ -57,11 +58,11 @@ export function ConnectRouterDialog({ open, onOpenChange, onCreated }: Props) {
   }, [routerId, connected, onCreated]);
 
   async function createCommand() {
-    if (!businessId || nameErr || ifaceErr) return;
+    if (!businessId || nameErr || ifaceErr || ssidErr) return;
     setSaving(true);
     const { data: row, error } = await supabase
       .from("routers")
-      .insert({ business_id: businessId, name: name.trim(), connection_mode: "agent", hotspot_interface: iface, hotspot_cidr: cidr })
+      .insert({ business_id: businessId, name: name.trim(), connection_mode: "agent", hotspot_interface: iface, hotspot_cidr: cidr, wifi_ssid: allPorts ? ssid.trim() : null })
       .select("id")
       .single();
     if (error || !row) {
@@ -107,6 +108,14 @@ export function ConnectRouterDialog({ open, onOpenChange, onCreated }: Props) {
               <Input id="r-name" value={name} onChange={(e) => setName(e.target.value)} placeholder="Reception" />
               {name && nameErr && <p className="text-sm text-destructive">{nameErr}</p>}
             </div>
+            {allPorts && (
+              <div className="space-y-1.5">
+                <Label htmlFor="r-ssid">Wi-Fi name for guests</Label>
+                <Input id="r-ssid" value={ssid} onChange={(e) => setSsid(e.target.value.replace(/[^A-Za-z0-9 _-]/g, "").slice(0, 32))} placeholder="Hotel Guest" />
+                <p className="text-xs text-muted-foreground">The router makes this Wi-Fi itself and shows the guest login page when someone joins.</p>
+                {ssid && ssidErr && <p className="text-sm text-destructive">{ssidErr}</p>}
+              </div>
+            )}
             <fieldset className="space-y-2">
               <legend className="text-sm font-medium">Which ports are for guests and staff?</legend>
               <label className="flex items-start gap-2 text-sm">
@@ -133,7 +142,7 @@ export function ConnectRouterDialog({ open, onOpenChange, onCreated }: Props) {
                 {NETWORKS.map((n) => <option key={n} value={n}>{n}</option>)}
               </select>
             </div>
-            <Button className="w-full" onClick={createCommand} disabled={saving || !!nameErr || !!ifaceErr}>
+            <Button className="w-full" onClick={createCommand} disabled={saving || !!nameErr || !!ifaceErr || !!ssidErr}>
               {saving && <Loader2 className="h-4 w-4 animate-spin" />} Create setup command
             </Button>
           </div>
@@ -167,14 +176,7 @@ export function ConnectRouterDialog({ open, onOpenChange, onCreated }: Props) {
           <div className="space-y-4 text-center">
             <CheckCircle2 className="mx-auto h-10 w-10 text-green-600" />
             <p className="font-medium">{name} is connected.</p>
-            {allPorts && (
-              <div className="space-y-2 text-left">
-                <p className="text-sm text-muted-foreground">To switch on the router's Wi-Fi for guests, enter a Wi-Fi name and paste this in the terminal.</p>
-                <Input value={ssid} onChange={(e) => setSsid(e.target.value.replace(/[^A-Za-z0-9 _-]/g, "").slice(0, 32))} placeholder="Wi-Fi name, e.g. Hotel Guest" aria-label="Wi-Fi name" />
-                <Textarea readOnly rows={3} className="font-mono text-xs" onFocus={(e) => e.currentTarget.select()}
-                  value={`/interface wireless set [find default-name=wlan1] mode=ap-bridge ssid="${ssid || "Guest WiFi"}" country=kenya disabled=no`} />
-              </div>
-            )}
+            {allPorts && ssid && <p className="text-sm text-muted-foreground">Wi-Fi <b>{ssid}</b> is on. Join it from a phone to see the guest login page.</p>}
             <div className="rounded-lg border bg-muted/40 p-3 text-left text-sm">
               <p className="font-medium">Test it</p>
               <ol className="mt-1 list-decimal space-y-1 pl-5 text-muted-foreground">

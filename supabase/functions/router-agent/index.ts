@@ -33,7 +33,7 @@ Deno.serve(async (req) => {
     try {
       return text(buildSetupScript({
         baseUrl, routerId: data.router_id, agentKey: data.key, routerName: data.name,
-        iface: data.interface, cidr: data.cidr,
+        iface: data.interface, cidr: data.cidr, ssid: data.ssid,
       }));
     } catch (e) {
       console.error("script build failed", (e as Error).message);
