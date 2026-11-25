@@ -186,6 +186,8 @@ export type Database = {
           phone: string | null
           primary_color: string | null
           accent_color: string | null
+          onboarded_at: string | null
+          onboarding_answers: Json
           prune_inactive_after_days: number | null
           redirect_url_after_purchase: string | null
           stripe_enabled: boolean
@@ -211,6 +213,8 @@ export type Database = {
           phone?: string | null
           primary_color?: string | null
           accent_color?: string | null
+          onboarded_at?: string | null
+          onboarding_answers?: Json
           prune_inactive_after_days?: number | null
           redirect_url_after_purchase?: string | null
           stripe_enabled?: boolean
@@ -236,6 +240,8 @@ export type Database = {
           phone?: string | null
           primary_color?: string | null
           accent_color?: string | null
+          onboarded_at?: string | null
+          onboarding_answers?: Json
           prune_inactive_after_days?: number | null
           redirect_url_after_purchase?: string | null
           stripe_enabled?: boolean

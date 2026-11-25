@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { Logo } from "@/components/Logo";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { GoogleButton, OrDivider } from "@/components/auth/GoogleButton";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 import { z } from "zod";
@@ -88,7 +89,10 @@ export default function Register() {
           <div className="lg:hidden mb-6"><Logo /></div>
           <h1 className="font-display text-2xl font-bold text-foreground">Create your business</h1>
           <p className="text-sm text-muted-foreground mt-1">You'll be the Business Owner.</p>
-          <form onSubmit={onSubmit} className="mt-6 space-y-3.5">
+          <div className="mt-6"><GoogleButton label="Sign up with Google" /></div>
+          <p className="mt-2 text-center text-xs text-muted-foreground">You'll add your business details on the next step.</p>
+          <OrDivider />
+          <form onSubmit={onSubmit} className="space-y-3.5">
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5"><Label>Your name</Label><Input value={form.full_name} onChange={(e) => set("full_name", e.target.value)} required /></div>
               <div className="space-y-1.5"><Label>Phone</Label><Input value={form.phone} onChange={(e) => set("phone", e.target.value)} placeholder="+254..." /></div>

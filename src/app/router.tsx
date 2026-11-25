@@ -10,6 +10,7 @@ import Packages from "@/pages/dashboard/Packages";
 import Vouchers from "@/pages/dashboard/Vouchers";
 import StaffAccess from "@/pages/dashboard/StaffAccess";
 import { BrandingProvider } from "@/components/brand/BrandingProvider";
+import Welcome from "@/pages/Welcome";
 import Branding from "@/pages/dashboard/Branding";
 import Settings from "@/pages/dashboard/Settings";
 import CaptivePortal from "@/pages/dashboard/CaptivePortal";
@@ -41,6 +42,7 @@ export function AppRouter() {
         <Route path="/dashboard/sessions" element={<ProtectedRoute><Sessions /></ProtectedRoute>} />
         <Route path="/dashboard/billing" element={<ProtectedRoute><Billing /></ProtectedRoute>} />
         <Route path="/dashboard/properties" element={<ProtectedRoute><Properties /></ProtectedRoute>} />
+        <Route path="/welcome" element={<ProtectedRoute><Welcome /></ProtectedRoute>} />
         <Route path="/checkout" element={<ProtectedRoute><Checkout /></ProtectedRoute>} />
         <Route path="/wifi/check" element={<WifiSelfCare />} />
         <Route path="/buy/:businessId" element={<WifiSelfCare />} />

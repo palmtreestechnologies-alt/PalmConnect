@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { Logo } from "@/components/Logo";
+import { GoogleButton, OrDivider } from "@/components/auth/GoogleButton";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 import { z } from "zod";
@@ -54,7 +55,9 @@ export default function Login() {
           <div className="lg:hidden mb-6"><Logo /></div>
           <h1 className="font-display text-2xl font-bold text-foreground">Sign in</h1>
           <p className="text-sm text-muted-foreground mt-1">Welcome back to Palm Connect.</p>
-          <form onSubmit={onSubmit} className="mt-6 space-y-4">
+          <div className="mt-6"><GoogleButton /></div>
+          <OrDivider />
+          <form onSubmit={onSubmit} className="space-y-4">
             <div className="space-y-1.5">
               <Label htmlFor="email">Email</Label>
               <Input id="email" type="email" autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
