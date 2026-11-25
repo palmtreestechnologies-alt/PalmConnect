@@ -136,13 +136,15 @@ export function buildSetupScript(p: SetupParams): string {
     // Ports join the bridge last: if the connection you pasted this over drops for a moment, setup is already done.
     ...(bridge && p.ssid ? [
       ':put "Palm Connect: turning on the Wi-Fi ..."',
-      `:do {/interface wireless set [find default-name=wlan1] mode=ap-bridge ssid="${p.ssid}" country=kenya band=2ghz-b/g/n frequency=auto disabled=no} on-error={:put "Palm Connect: could not turn on the Wi-Fi. You can set it in WinBox under Wireless."}`,
+      `:do {/interface wireless set [find default-name=wlan1] mode=ap-bridge ssid="${p.ssid}" country=kenya band=2ghz-b/g/n frequency=auto security-profile=default disabled=no} on-error={:put "Palm Connect: could not turn on the Wi-Fi. You can set it in WinBox under Wireless."}`,
     ] : []),
     ...(bridge ? [
       ':put "Palm Connect: adding ports to the guest network ..."',
       addPorts("ethernet", ' where name!="ether1"'),
       addPorts("wireless", ""),
       addPorts("wifi", ""),
+      // Remove the temporary setup Wi-Fi network (palm-mgmt) if the owner created one to reach the router.
+      ':do {/ip dhcp-server remove [find name=palm-mgmt-dhcp]; /ip dhcp-server network remove [find comment=palm-mgmt]; /ip pool remove [find name=palm-mgmt-pool]; /ip address remove [find comment=palm-mgmt]; /ip firewall nat remove [find comment=palm-mgmt]} on-error={}',
     ] : []),
     ':log info "Palm Connect: setup complete"',
     ':put "Palm Connect: setup complete. This router will appear as Online in your dashboard within a minute."',
